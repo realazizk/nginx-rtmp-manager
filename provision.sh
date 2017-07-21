@@ -1,6 +1,13 @@
 #!/usr/bin/env bash
 
 ###
+# Config
+###
+
+export DEV=1
+sudo export DEV=1
+
+###
 # Prepare dependencies
 ###
 sudo apt-get update -y
@@ -27,6 +34,14 @@ ln -s /home/vagrant/.local/sbin/nginx /home/vagrant/.local/bin/nginx
 export PATH=$PATH:~/.local/bin
 echo "export PATH=$PATH:~/.local/bin" >> ~/.bashrc
 
+###
+# Prepare the database
+###
+
+sudo apt-get install postgresql postgresql-contribpostgresql-server-dev-9.3  -y
+sudo su postgres -c "psql -c \"CREATE ROLE vagrant SUPERUSER LOGIN PASSWORD 'vagrant'\" "
+export DATABASE_URL="postgresql://vagrant:vagrant@localhost/database"
+sudo su postgres -c "createdb -E UTF8 -T template0 --locale=en_US.utf8 -O vagrant database"
 
 ###
 # Application
@@ -36,7 +51,7 @@ cd /app
 
 cp -r nginx.conf /home/vagrant/.local/conf/nginx.conf
 
-sudo apt-get install python3 python3-pip libyaml-dev -y
+sudo apt-get install python3 python3-pip libyaml-dev libffi-dev -y
 
 curl -sL https://deb.nodesource.com/setup_7.x | sudo -E bash -
 

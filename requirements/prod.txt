@@ -1,5 +1,10 @@
-Flask==0.12.2
-Flask_SQLAlchemy==2.2
-marshmallow==2.13.5
 flask_apispec==0.4.0
+Flask==0.12.2
+Flask_Bcrypt==0.7.1
+Flask_SQLAlchemy==2.2
+six==1.10.0
+marshmallow==2.13.5
+Flask_Script==2.0.5
+flask_jwt==0.3.2
 git+https://github.com/mohamed-aziz/python-nginx.git
+psycopg2
