@@ -1,0 +1,5 @@
+Flask==0.12.2
+Flask_SQLAlchemy==2.2
+marshmallow==2.13.5
+flask_apispec==0.4.0
+git+https://github.com/mohamed-aziz/python-nginx.git

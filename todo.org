@@ -1,0 +1,15 @@
+So I want to implement some type of a stream manager.
+
+The goal of this solution is to solve the problem of
+streaming live audio to subscribers, this should
+handle more than 5K concurrent users.
+
+The first iteration of this project was implemented
+using a twisted protocol (RTMP).
+
+I ended up using Nginx server using RTMP protocol and then
+activate HLS to stream using a browser plugin (because flash sucks, fuck you adobe).
+
+* TODO Implement some type of authentication.
+* TODO Implement an interface to display beautiful graphs and some stats.
+* TODO Implement some type of interface to interfere with the nginx config to allow me the operator to create other configurations.
