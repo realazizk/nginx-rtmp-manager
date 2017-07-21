@@ -5,7 +5,6 @@
 ###
 
 export DEV=1
-sudo export DEV=1
 
 ###
 # Prepare dependencies

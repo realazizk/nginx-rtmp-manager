@@ -80,8 +80,19 @@ class UserModel(db.Model, SurrogatePK):
     created_at = Column(db.DateTime, nullable=False,
                         default=dt.datetime.utcnow)
 
+    def __init__(self, username, email, password=None, **kwargs):
+        super().__init__(username=username, email=email, **kwargs)
+        if password:
+            self.set_password(password)
+        else:
+            self.password = None
+
     def check_password(self, value):
         return bcrypt.check_password_hash(self.password, value)
+
+    def set_password(self, value):
+        self.password = bcrypt.generate_password_hash(value)
+
 
 
 ###

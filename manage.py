@@ -16,8 +16,9 @@ def drop():
 @manager.command
 def makesuperuser():
     username = prompt('Enter username')
+    email = prompt('Enter email')
     password = prompt_pass('Enter password')
-    user = UserModel.create(username=username, password=username)
+    user = UserModel.create(username=username, password=password, email=email)
     user.save()
 
 
