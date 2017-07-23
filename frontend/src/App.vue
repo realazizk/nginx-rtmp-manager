@@ -101,7 +101,7 @@ export default {
       this.$http.post(STREAM_ADD_URL, data, {headers: auth.getAuthHeader()})
         .then(response => {
           let data = response.data
-          data.errros
+          // data.errros
         },response => {
 
           // error callback

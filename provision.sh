@@ -37,7 +37,7 @@ echo "export PATH=$PATH:~/.local/bin" >> ~/.bashrc
 # Prepare the database
 ###
 
-sudo apt-get install postgresql postgresql-contribpostgresql-server-dev-9.3  -y
+sudo apt-get install postgresql postgresql-contrib postgresql-server-dev-9.3  -y
 sudo su postgres -c "psql -c \"CREATE ROLE vagrant SUPERUSER LOGIN PASSWORD 'vagrant'\" "
 export DATABASE_URL="postgresql://vagrant:vagrant@localhost/database"
 sudo su postgres -c "createdb -E UTF8 -T template0 --locale=en_US.utf8 -O vagrant database"
