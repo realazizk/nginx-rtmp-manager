@@ -5,7 +5,6 @@ import Login from '@/components/Login'
 
 
 Vue.use(Router)
-Vue.use(Login)
 
 export default new Router({
   routes: [

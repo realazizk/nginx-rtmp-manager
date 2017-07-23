@@ -50,7 +50,7 @@ cd /app
 
 cp -r nginx.conf /home/vagrant/.local/conf/nginx.conf
 
-sudo apt-get install python3 python3-pip libyaml-dev libffi-dev -y
+sudo apt-get install libyaml-dev libffi-dev -y
 
 curl -sL https://deb.nodesource.com/setup_7.x | sudo -E bash -
 
@@ -60,4 +60,4 @@ sudo npm install npm@latest -g
 
 sudo ln -s /usr/bin/nodejs /usr/bin/node
 
-sudo pip3 install -r requirements/dev.txt
+sudo pip3.6 install -r requirements/dev.txt

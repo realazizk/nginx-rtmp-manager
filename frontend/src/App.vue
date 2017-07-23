@@ -1,14 +1,121 @@
 <template>
-  <div id="app">
-    <img src="./assets/logo.png">
-    <router-view></router-view>
+    <div id="app">
+        <nav class="navbar navbar-inverse" id="nav">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="#">Stream manager</a>
+                </div>
+                <ul class="nav navbar-nav">
+                    <router-link active-class="active" tag="li" to="home"><router-link to="home">Home</router-link></router-link>
+
+                    <router-link active-class="active"  tag="li" to="about"><router-link to="about">About</router-link></router-link>
+                    <router-link active-class="active"  tag="li" to="contact"> <router-link to="contact">Contact</router-link> </router-link>     </li>
+
+                    <li class="dropdown" v-if="user.authenticated">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Admin actions<span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li class="dropdown-header">Stream</li>
+                            <li><a @click="opentheModal()" href="#">Add stream</a></li>
+                            <li><a href="#">Delete stream</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li class="dropdown-header">Users</li>
+                            <li><a href="#">Add admin</a></li>
+                            <li><a href="#">Delete admin</a></li>
+                        </ul>
+                    </li>
+
+                </ul>
+
+
+
+                <ul class="nav navbar-nav navbar-right">
+                    <template v-if="!user.authenticated">
+                        <router-link active-class="active" tag="li" to="login">
+                            <router-link to="login">
+                                <span class="glyphicon glyphicon-log-in"></span> Login
+                            </router-link>
+                        </router-link>
+                      </template>
+                    <template v-else>
+                      <li>
+                        <router-link to="login" v-on:click.native="logout()">
+                          <span class="glyphicon glyphicon-log-in"></span> Logout
+                        </router-link>
+                      </li>
+                    </template>
+                </ul>
+</div>
+</nav>
+
+<bootstrap-modal ref="addstream" :needHeader="true" :needFooter="false" size="large">
+  <div slot="title">
+    Add stream
   </div>
+  <div slot="body">
+    <form action="">
+      <label for="name">The stream url</label>
+      <div class="input-group">
+        <span class="input-group-addon" id="basic-addon3">http://{{hostname}}</span>
+        <input type="text"   v-model="stream.name" class="form-control" id="name" aria-describedby="basic-addon3">
+      </div>
+
+      <label for="password">Password</label>
+      <input type="password"  v-model="stream.password" class="form-control" id="password">
+
+      <button type="submit" class="btn btn-default "  @click="submitstream()">Submit</button>
+
+    </form>
+  </div>
+
+</bootstrap-modal>
+
+</div>
 </template>
 
 <script>
-  export default {
-    name: 'app'
+  import auth from '@/auth'
+const API_URL = 'http://localhost:8080/'
+const STREAM_ADD_URL = API_URL + 'api/stream'
+export default {
+  name: 'app',
+  data() {
+    return {
+      user: auth.user,
+      stream: {
+        name: '',
+        password: ''
+      }
+    }
+  },
+  methods: {
+    opentheModal() {
+      this.$refs.addstream.open()
+    },
+    logout() {
+      auth.logout()
+    },
+
+    submitstream () {
+      var data = {name: this.stream.name, password: this.stream.password};
+      console.log(data)
+      this.$http.post(STREAM_ADD_URL, data, {headers: auth.getAuthHeader()})
+        .then(response => {
+          let data = response.data
+          data.errros
+        },response => {
+
+          // error callback
+        })
+    }
+
+  },
+  computed: {
+    hostname () {
+      return location.hostname + ':1935/stream/';
+    }
+
   }
+}
 </script>
 
 <style>
@@ -18,6 +125,10 @@
       -moz-osx-font-smoothing: grayscale;
       text-align: center;
       color: #2c3e50;
-      margin-top: 60px;
+      margin: 0;
+  }
+
+  #nav {
+      border-radius: 0;
   }
 </style>

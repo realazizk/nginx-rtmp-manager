@@ -9,13 +9,14 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy, Model
 from flask_bcrypt import Bcrypt
 from flask_jwt import JWT
+from flask_cors import CORS
 import os
+from datetime import timedelta
 
 
 ###
 # The configuration objects
 ###
-
 
 class Config:
     SECRET_KEY = os.environ.get('APP_SECRET', 'secret-key')
@@ -23,6 +24,8 @@ class Config:
     PROJECT_ROOT = os.path.abspath(os.path.join(APP_DIR, os.pardir))
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     BCRYPT_LOG_ROUNDS = 13
+    JWT_AUTH_USERNAME_KEY = 'username'
+    JWT_AUTH_HEADER_PREFIX = 'Token'
 
 
 class devConfig(Config):
@@ -32,6 +35,7 @@ class devConfig(Config):
     DB_NAME = 'dev.db'
     DB_PATH = os.path.join(os.path.expanduser('~'), DB_NAME)
     SQLALCHEMY_DATABASE_URI = 'sqlite:///{0}'.format(DB_PATH)
+    JWT_EXPIRATION_DELTA = timedelta(10**6)  # for easier testing
 
 
 class prodConfig(Config):
@@ -85,6 +89,7 @@ def authenticate(email, password):
 
 db = SQLAlchemy(model_class=CRUDMixin)
 bcrypt = Bcrypt()
+cors = CORS()
 
 # doing this workaround on circular imports
 # TODO: Make the modules less coupled
@@ -109,7 +114,14 @@ def app_factory(config: Config=devConfig) -> Flask:
 def register_extensions(app: Flask):
     db.init_app(app)
     bcrypt.init_app(app)
+    jwt.init_app(app)
+
 
 def register_blueprints(app: Flask):
     from app import bp
+    # use cors
+
+    origins = app.config.get('CORS_ORIGIN_WHITELIST', '*')
+    cors.init_app(bp, origins=origins)
+
     app.register_blueprint(bp)

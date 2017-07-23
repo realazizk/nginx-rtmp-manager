@@ -10,6 +10,9 @@ using a twisted protocol (RTMP).
 I ended up using Nginx server using RTMP protocol and then
 activate HLS to stream using a browser plugin (because flash sucks, fuck you adobe).
 
-* TODO Implement some type of authentication.
-* TODO Implement an interface to display beautiful graphs and some stats.
-* TODO Implement some type of interface to interfere with the nginx config to allow me the operator to create other configurations.
+No need to edit the nginx config on the fly and send signals to it
+just do the login in the application level.
+
+* TODO [#A] Implement some type of authentication.
+* TODO [#B] Implement an interface to display beautiful graphs and some stats.
+* TODO [#A] Implement feature to create room + register to admin.
