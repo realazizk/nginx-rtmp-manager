@@ -1,6 +1,12 @@
 #!/bin/bash
 
 ###
+# Audio Stream Manager
+# Copyright Mohamed Aziz knani <medazizknani@gmai.com> 2017
+###
+
+
+###
 # Install Python 3.6
 ###
 

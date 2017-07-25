@@ -1,8 +1,7 @@
 """
-Fast one file code
-Copyright Mohamed Aziz knani <medazizknani@gmai.com>
+Audio Stream Manager
+Copyright Mohamed Aziz knani <medazizknani@gmai.com> 2017
 
-Started on 2017/07/20 01:20
 """
 
 from flask import Flask

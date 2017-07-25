@@ -8,7 +8,6 @@
                 <ul class="nav navbar-nav">
                     <router-link active-class="active" tag="li" to="home"><router-link to="home">Home</router-link></router-link>
 
-                    <router-link active-class="active"  tag="li" to="about"><router-link to="about">About</router-link></router-link>
                     <router-link active-class="active"  tag="li" to="contact"> <router-link to="contact">Contact</router-link> </router-link>     </li>
 
                     <li class="dropdown" v-if="user.authenticated">
@@ -47,6 +46,11 @@
 </div>
 </nav>
 
+
+
+
+  <router-view></router-view>
+
 <bootstrap-modal ref="addstream" :needHeader="true" :needFooter="false" size="large">
   <div slot="title">
     Add stream
@@ -62,6 +66,12 @@
       <label for="password">Password</label>
       <input type="password"  v-model="stream.password" class="form-control" id="password">
 
+      <label for="sel1">Select stream type:</label>
+      <select v-model="stream.stype"  class="form-control" id="stype">
+        <option selected>video</option>
+        <option>audio</option>
+      </select>
+
       <button type="submit" class="btn btn-default "  @click="submitstream()">Submit</button>
 
     </form>
@@ -69,13 +79,16 @@
 
 </bootstrap-modal>
 
+
 </div>
 </template>
 
 <script>
-  import auth from '@/auth'
+import auth from '@/auth'
 const API_URL = 'http://localhost:8080/'
 const STREAM_ADD_URL = API_URL + 'api/stream'
+
+
 export default {
   name: 'app',
   data() {
@@ -83,7 +96,8 @@ export default {
       user: auth.user,
       stream: {
         name: '',
-        password: ''
+        password: '',
+        stype: '',
       }
     }
   },
@@ -96,12 +110,16 @@ export default {
     },
 
     submitstream () {
-      var data = {name: this.stream.name, password: this.stream.password};
-      console.log(data)
+      var data = {
+        name: this.stream.name,
+        password: this.stream.password,
+        stype: this.stream.stype
+      }
+      var modal = this.$refs.addstream
       this.$http.post(STREAM_ADD_URL, data, {headers: auth.getAuthHeader()})
         .then(response => {
           let data = response.data
-          // data.errros
+          modal.close()
         },response => {
 
           // error callback
@@ -126,9 +144,9 @@ export default {
       text-align: center;
       color: #2c3e50;
       margin: 0;
-  }
+}
 
-  #nav {
-      border-radius: 0;
-  }
+#nav {
+    border-radius: 0;
+}
 </style>

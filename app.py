@@ -1,6 +1,13 @@
+"""
+Audio Stream Manager
+Copyright Mohamed Aziz knani <medazizknani@gmai.com> 2017
+
+"""
+
 from flask import (Blueprint, jsonify, request)
 from marshmallow import Schema, fields
 from marshmallow.exceptions import ValidationError
+from marshmallow.validate import OneOf
 from flask_apispec import use_kwargs, marshal_with
 from injector import db, bcrypt
 import datetime as dt
@@ -118,9 +125,10 @@ class UserModel(db.Model, SurrogatePK):
 class StreamModel(db.Model, SurrogatePK):
     __tablename__ = 'streams'
     name = Column(db.String(80), unique=True, nullable=False)
-    password = Column(db.Binary(128), nullable=True)
+    password = Column(db.String(128), nullable=True)
     admin = relationship(UserModel, backref=db.backref('streams'))
     adminid = reference_col('users')
+    stype = Column(db.String(80), nullable=False)
 
     def __init__(self, name, password, **kwargs):
         super().__init__(name=name, password=password, **kwargs)
@@ -131,49 +139,16 @@ class StreamModel(db.Model, SurrogatePK):
 ###
 
 
-def ensure_binary_type(val):
-    if isinstance(val, marshmallow.compat.text_type):
-        val = val.encode('utf-8')
-    return marshmallow.compat.binary_type(val)
-
-
-class RosString(marshmallow.fields.Field):
-    """A ros string, serializing as ros python field type :
-    Python <3.0 implies str, python >3.0 implies bytes
-
-    If you need unicode serialization, have a look at RosTextString.
-
-    No marshmallow field class for this, so we're declaring it here.
-
-    :param kwargs: The same keyword arguments that :class:`Field` receives. required is set to True by default.
-    """
-    default_error_messages = {
-        'invalid': 'Not a valid binary string.'
-    }
-
-    def __init__(self, **kwargs):
-        super(RosString, self).__init__(**kwargs)
-
-    def _serialize(self, value, attr, obj):
-        if value is None:
-            return None
-        return ensure_binary_type(value)
-
-    def _deserialize(self, value, attr, data):
-        if not isinstance(value, marshmallow.compat.basestring):
-            self.fail('invalid')
-        return ensure_binary_type(value)
-
-
 class UserSchema(Schema):
-    username = RosString(required=True)
-    password = RosString(required=True, load_only=True)
-    id_token = RosString(dump_only=True)
+    username = fields.Str(required=True)
+    password = fields.Str(required=True, load_only=True)
+    id_token = fields.Str(dump_only=True)
 
 
 class StreamSchema(Schema):
-    name = RosString(required=True)
-    password = RosString(required=True)
+    name = fields.Str(required=True)
+    password = fields.Str(required=True, load_only=True)
+    stype = fields.Str(required=True, validate=OneOf(['video', 'audio']))
 
 
 StreamsSchema = StreamSchema(many=True)
@@ -189,7 +164,7 @@ def errorize(func):
         try:
             result = func(*args, **kwargs)
         except ValidationError as e:
-            return jsonify({'errors': e.messages})
+            return jsonify({'errors': e.messages}), 400
         return result
 
     return wrapper
@@ -208,6 +183,7 @@ def login(username=None, password=None):
         raise ValidationError("Specify username and password fields")
     log.info('Username {0} is trying to authenticate'.format(username))
     user = UserModel.query.filter_by(username=username).first()
+    print(user)
     if user is not None and user.check_password(password):
         return user
     return '', 400
@@ -218,16 +194,23 @@ def login(username=None, password=None):
 @use_kwargs(StreamSchema)
 @marshal_with(StreamSchema)
 @errorize
-def make_stream(name=None, password=None):
-    if not name or not password:
-        raise ValidationError("Specify name and password fields")
+def make_stream(name=None, password=None, stype=None):
+    print(name, password, stype)
+    if not name or not password or not stype:
+        raise ValidationError("Specify name, password and stream type fields")
 
     if StreamModel.query.filter_by(name=name).first():
-        raise ValidationError("Stream already exisiting")
+        raise ValidationError("Stream already existing")
 
     stream = StreamModel.create(name=name, password=password,
-                                admin=current_identity)
+                                admin=current_identity, stype=stype)
     return stream
+
+
+@bp.route('/api/streams', methods=('GET',))
+@marshal_with(StreamsSchema)
+def streams():
+    return StreamModel.query.all()
 
 
 @bp.route('/auth', methods=('GET',))

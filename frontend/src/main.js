@@ -14,6 +14,7 @@ let bs_modal = require('vue2-bootstrap-modal')
 Vue.use(VueResource)
 Vue.component('bootstrap-modal', bs_modal)
 
+
 // checks auth in start of the application
 auth.checkAuth()
 
