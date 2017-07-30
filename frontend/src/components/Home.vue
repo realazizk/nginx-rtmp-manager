@@ -33,10 +33,6 @@
        this.player.on(Hls.Events.MANIFEST_PARSED, function() {
          audio.play();
        });
-       this.player.on("hlsError", function(event, data) {
-         alert("Not playing")
-       })
-
      }
    },
     created() {
