@@ -5,80 +5,23 @@ Copyright Mohamed Aziz knani <medazizknani@gmai.com> 2017
 """
 
 from flask import (Blueprint, jsonify, request)
-from marshmallow import Schema, fields
 from marshmallow.exceptions import ValidationError
-from marshmallow.validate import OneOf
 from flask_apispec import use_kwargs, marshal_with
-from injector import db, bcrypt
-import datetime as dt
 from functools import wraps
-from six import PY2
 import logging
-from sqlalchemy.orm import relationship
-from flask_jwt import (_default_jwt_encode_handler,
-                       current_identity,
+from flask_jwt import (current_identity,
                        jwt_required)
-import marshmallow
+from flask_uploads import UploadSet, AUDIO
+from tasks.stream import play_task
+from models import (JobModel, StreamModel, UserModel)
+from serializers import StreamsSchema, JobSchema, UserSchema, StreamSchema
 
 
 bp = Blueprint(__name__.split('.')[0], import_name='app')
 
 
-###
-# Compatibility (though code is compatible only with PY3K)
-###
+uset = UploadSet('files', AUDIO)
 
-if PY2:
-    text_type = unicode  # noqa
-    binary_type = str
-    string_types = (str, unicode)  # noqa
-    unicode = unicode  # noqa
-    basestring = basestring  # noqa
-else:
-    text_type = str
-    binary_type = bytes
-    string_types = (str,)
-    unicode = str
-    basestring = (str, bytes)
-
-
-###
-# Extensions
-###
-
-class SurrogatePK(object):
-    """A mixin that adds a surrogate integer 'primary key' column named ``id`` \
-        to any declarative-mapped class.
-    """
-
-    __table_args__ = {'extend_existing': True}
-
-    id = db.Column(db.Integer, primary_key=True)
-
-    @classmethod
-    def get_by_id(cls, record_id):
-        """Get record by ID."""
-        if any(
-                (isinstance(record_id, basestring) and record_id.isdigit(),
-                 isinstance(record_id, (int, float))),
-        ):
-            return cls.query.get(int(record_id))
-
-
-def reference_col(tablename, nullable=False, pk_name='id', **kwargs):
-    """Column that adds primary key foreign key reference.
-
-    Usage: ::
-
-        category_id = reference_col('category')
-        category = relationship('Category', backref='categories')
-    """
-    return db.Column(
-        db.ForeignKey('{0}.{1}'.format(tablename, pk_name)),
-        nullable=nullable, **kwargs)
-
-
-Column = db.Column
 
 ###
 # Logging
@@ -90,68 +33,6 @@ handler = logging.StreamHandler()
 formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
 handler.setFormatter(formatter)
 log.addHandler(handler)
-
-
-###
-# Models
-###
-
-class UserModel(db.Model, SurrogatePK):
-    __tablename__ = 'users'
-    username = Column(db.String(80), unique=True, nullable=False)
-    email = Column(db.String(100), unique=True, nullable=False)
-    password = Column(db.Binary(128), nullable=True)
-    created_at = Column(db.DateTime, nullable=False,
-                        default=dt.datetime.utcnow)
-
-    def __init__(self, username, email, password=None, **kwargs):
-        super().__init__(username=username, email=email, **kwargs)
-        if password:
-            self.set_password(password)
-        else:
-            self.password = None
-
-    def check_password(self, value):
-        return bcrypt.check_password_hash(self.password, value)
-
-    def set_password(self, value):
-        self.password = bcrypt.generate_password_hash(value)
-
-    @property
-    def id_token(self):
-        return _default_jwt_encode_handler(self).decode('utf-8')
-
-
-class StreamModel(db.Model, SurrogatePK):
-    __tablename__ = 'streams'
-    name = Column(db.String(80), unique=True, nullable=False)
-    password = Column(db.String(128), nullable=True)
-    admin = relationship(UserModel, backref=db.backref('streams'))
-    adminid = reference_col('users')
-    stype = Column(db.String(80), nullable=False)
-
-    def __init__(self, name, password, **kwargs):
-        super().__init__(name=name, password=password, **kwargs)
-
-
-###
-# Serializes
-###
-
-
-class UserSchema(Schema):
-    username = fields.Str(required=True)
-    password = fields.Str(required=True, load_only=True)
-    id_token = fields.Str(dump_only=True)
-
-
-class StreamSchema(Schema):
-    name = fields.Str(required=True)
-    password = fields.Str(required=True, load_only=True)
-    stype = fields.Str(required=True, validate=OneOf(['video', 'audio']))
-
-
-StreamsSchema = StreamSchema(many=True)
 
 
 ###
@@ -195,7 +76,6 @@ def login(username=None, password=None):
 @marshal_with(StreamSchema)
 @errorize
 def make_stream(name=None, password=None, stype=None):
-    print(name, password, stype)
     if not name or not password or not stype:
         raise ValidationError("Specify name, password and stream type fields")
 
@@ -213,9 +93,30 @@ def streams():
     return StreamModel.query.all()
 
 
+@bp.route('/api/uploadfile/<jobid>', methods=('POST',))
+def fileupload(jobid):
+    # mfile = uset.save(request.files['file'])
+    pass
+    # update job with file
+    
+
 @bp.route('/auth', methods=('GET',))
 def authorize():
     log.info('Got an authentication request')
     log.info(request.args)
 
     return '', 200
+
+
+@bp.route('/api/job', methods=('POST',))
+@jwt_required()
+@use_kwargs(JobSchema)
+@marshal_with(JobSchema)
+@errorize
+def newjob(stream, username):
+    stream = StreamModel.query.filter_by(name=stream)
+    if not stream:
+        raise ValidationError('Submit a valid stream faggot')
+    job = JobModel(streamid=stream.id, adminid=current_identity.id)
+    task = play_task.apply_async(job, countdown=10)
+    return job

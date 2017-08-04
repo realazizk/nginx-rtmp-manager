@@ -1,55 +1,59 @@
 <template>
-    <div id="app">
-        <nav class="navbar navbar-inverse" id="nav">
-            <div class="container-fluid">
-                <div class="navbar-header">
-                    <a class="navbar-brand" href="#">Stream manager</a>
-                </div>
-                <ul class="nav navbar-nav">
-                    <router-link active-class="active" tag="li" to="home"><router-link to="home">Home</router-link></router-link>
+  <div id="app">
+    <nav class="navbar navbar-inverse" id="nav">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="#">Stream manager</a>
+        </div>
+        <ul class="nav navbar-nav">
+          <router-link active-class="active" tag="li" to="home"><router-link to="home">Home</router-link></router-link>
 
-                    <router-link active-class="active"  tag="li" to="contact"> <router-link to="contact">Contact</router-link> </router-link>     </li>
+          <router-link active-class="active"  tag="li" to="contact"> <router-link to="contact">Contact</router-link> </router-link>     </li>
 
-                    <li class="dropdown" v-if="user.authenticated">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Admin actions<span class="caret"></span></a>
-                        <ul class="dropdown-menu">
-                            <li class="dropdown-header">Stream</li>
-                            <li><a @click="opentheModal()" href="#">Add stream</a></li>
-                            <li><a href="#">Delete stream</a></li>
-                            <li role="separator" class="divider"></li>
-                            <li class="dropdown-header">Users</li>
-                            <li><a href="#">Add admin</a></li>
-                            <li><a href="#">Delete admin</a></li>
-                        </ul>
-                    </li>
+<li class="dropdown" v-if="user.authenticated">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Admin actions<span class="caret"></span></a>
+  <ul class="dropdown-menu">
+    <li class="dropdown-header">Stream</li>
+    <li><a @click="opentheModal()" href="#">Add stream</a></li>
+    <li><a href="#">Delete stream</a></li>
+    <li role="separator" class="divider"></li>
+    <li class="dropdown-header">Users</li>
+    <li><a href="#">Add admin</a></li>
+    <li><a href="#">Delete admin</a></li>
 
-                </ul>
+    <li class="dropdown-header">Jobs</li>
+    <li><router-link to="jobs">Manage jobs</router-link></li>
+    <li><a @click="opentheJobModal()" href="#">Add a job</a></li>
+  </ul>
+</li>
+
+</ul>
 
 
 
-                <ul class="nav navbar-nav navbar-right">
-                    <template v-if="!user.authenticated">
-                        <router-link active-class="active" tag="li" to="login">
-                            <router-link to="login">
-                                <span class="glyphicon glyphicon-log-in"></span> Login
-                            </router-link>
-                        </router-link>
-                      </template>
-                    <template v-else>
-                      <li>
-                        <router-link to="login" v-on:click.native="logout()">
-                          <span class="glyphicon glyphicon-log-in"></span> Logout
-                        </router-link>
-                      </li>
-                    </template>
-                </ul>
+<ul class="nav navbar-nav navbar-right">
+  <template v-if="!user.authenticated">
+    <router-link active-class="active" tag="li" to="login">
+      <router-link to="login">
+        <span class="glyphicon glyphicon-log-in"></span> Login
+      </router-link>
+    </router-link>
+  </template>
+  <template v-else>
+    <li>
+      <router-link to="login" v-on:click.native="logout()">
+        <span class="glyphicon glyphicon-log-in"></span> Logout
+      </router-link>
+    </li>
+  </template>
+</ul>
 </div>
 </nav>
 
 
 
 
-  <router-view></router-view>
+<router-view></router-view>
 
 <bootstrap-modal ref="addstream" :needHeader="true" :needFooter="false" size="large">
   <div slot="title">
@@ -79,6 +83,40 @@
 
 </bootstrap-modal>
 
+<bootstrap-modal ref="addJob" :needHeader="true" :needFooter="false" size="large">
+  <div slot="title">
+    Add a job
+  </div>
+  <div slot="body">
+    <form action="">
+      <label for="fileinput">The file (can convert video to audio only)</label>
+      <input id="fileinput" type="file" class="file">
+      
+      <div class="form-group">
+	<label for="dtinput1">Enter date</label>
+	<div class='input-group date' id='datetimepicker1'>
+	  
+          <input id="dtinput1" type='text' class="form-control" />
+          <span class="input-group-addon">
+            <span class="glyphicon glyphicon-calendar"></span>
+          </span>
+	</div>
+      </div>
+      <label for="selst">Select the channel to stream to</label>
+      <select v-model="job.sname"  class="form-control" id="selst">
+        <option v-for="stream in job.streams">
+          {{stream.name}}
+        </option>
+      </select>
+
+      <button type="submit" class="btn btn-default "  @click="submitjob()">Submit</button>
+
+    </form>
+  </div>
+
+</bootstrap-modal>
+
+
 
 </div>
 </template>
@@ -98,15 +136,27 @@ export default {
         name: '',
         password: '',
         stype: '',
-      }
+      },
+      job: {
+        streams: [],
+        sname: ''
+      },
+
     }
   },
   methods: {
     opentheModal() {
       this.$refs.addstream.open()
     },
+    opentheJobModal() {
+      this.$refs.addJob.open()
+    },
     logout() {
       auth.logout()
+    },
+
+    submitjob() {
+
     },
 
     submitstream () {
@@ -132,6 +182,23 @@ export default {
       return location.hostname + ':1935/stream/';
     }
 
+  },
+
+  created() {
+    this.$http.get(API_URL + 'api/streams').then(
+      response => {
+        let data = response.body
+        this.job.streams = data
+      }
+    )
+
+  },
+  mounted () {
+    $(function () {
+      $('#datetimepicker1').datetimepicker({
+	minDate:new Date()
+      });
+    });
   }
 }
 </script>
@@ -144,7 +211,7 @@ export default {
       text-align: center;
       color: #2c3e50;
       margin: 0;
-}
+  }
 
 #nav {
     border-radius: 0;

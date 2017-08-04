@@ -15,4 +15,5 @@ just do the login in the application level.
 
 * TODO [#A] Implement some type of authentication.
 * TODO [#B] Implement an interface to display beautiful graphs and some stats.
-* TODO [#A] Implement feature to create room + register to admin.
+* DONE [#A] Implement feature to create room + register to admin.
+* TODO [#A] Implement a job schduler.

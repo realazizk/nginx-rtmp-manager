@@ -7,13 +7,14 @@ import VueResource from 'vue-resource'
 import auth from './auth'
 import $ from 'jquery'
 import 'bootstrap'
+import 'bootstrap-fileinput'
+import dateTimePicker from 'eonasdan-bootstrap-datetimepicker'
+import 'eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.css'
 
 let bs_modal = require('vue2-bootstrap-modal')
 
-
 Vue.use(VueResource)
 Vue.component('bootstrap-modal', bs_modal)
-
 
 // checks auth in start of the application
 auth.checkAuth()

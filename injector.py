@@ -11,6 +11,8 @@ from flask_jwt import JWT
 from flask_cors import CORS
 import os
 from datetime import timedelta
+from celery import Celery
+from flask_uploads import configure_uploads
 
 
 ###
@@ -25,7 +27,11 @@ class Config:
     BCRYPT_LOG_ROUNDS = 13
     JWT_AUTH_USERNAME_KEY = 'username'
     JWT_AUTH_HEADER_PREFIX = 'Token'
-
+    CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+    CELERY_BROKER_URL = 'redis://localhost:6379'
+    CELERY_IMPORTS = ['tasks.stream']
+    UPLOADS_DEFAULT_DEST = '/tmp/'
+    UPLOADS_DEFAULT_URL = 'example'
 
 class devConfig(Config):
     """
@@ -89,6 +95,7 @@ def authenticate(email, password):
 db = SQLAlchemy(model_class=CRUDMixin)
 bcrypt = Bcrypt()
 cors = CORS()
+celery = Celery(__name__, broker=Config.CELERY_BROKER_URL)
 
 # doing this workaround on circular imports
 # TODO: Make the modules less coupled
@@ -106,6 +113,7 @@ def app_factory(config: Config=devConfig) -> Flask:
     app.url_map.strict_slashes = False
     register_extensions(app)
     register_blueprints(app)
+    celery.conf.update(app.config)
 
     return app
 
@@ -114,6 +122,8 @@ def register_extensions(app: Flask):
     db.init_app(app)
     bcrypt.init_app(app)
     jwt.init_app(app)
+    from app import uset
+    configure_uploads(app, (uset))
 
 
 def register_blueprints(app: Flask):

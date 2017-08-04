@@ -22,7 +22,6 @@ import flask
 
 
 isdebug = util.strtobool(environ.get('DEV', None))
-print(isdebug)
 app = app_factory(devConfig if isdebug else prodConfig)
 manager = Manager(app)
 
