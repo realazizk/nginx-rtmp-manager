@@ -28,23 +28,11 @@ manager = Manager(app)
 
 
 @manager.command
-def drop():
-    if prompt_bool("Are you sure you want to lose all your data"):
-        db.drop_all()
-
-
-@manager.command
 def makesuperuser():
     username = prompt('Enter username')
     email = prompt('Enter email')
     password = prompt_pass('Enter password')
     UserModel.create(username=username, password=password, email=email)
-
-
-@manager.command
-def create():
-    "Creates database tables from sqlalchemy models"
-    db.create_all()
 
 
 class GunicornServer(Command):
