@@ -23,7 +23,7 @@ class StreamSchema(Schema):
 
 class JobSchema(Schema):
     stream = fields.Str(required=True)
-    username = fields.Str(required=True)
+    user = fields.Nested(UserSchema, dump_only=True)
     filename = fields.Str()
     id = fields.Str()
 

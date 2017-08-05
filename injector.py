@@ -13,6 +13,7 @@ import os
 from datetime import timedelta
 from celery import Celery
 from flask_uploads import configure_uploads
+from flask_migrate import Migrate
 
 
 ###
@@ -96,6 +97,7 @@ db = SQLAlchemy(model_class=CRUDMixin)
 bcrypt = Bcrypt()
 cors = CORS()
 celery = Celery(__name__, broker=Config.CELERY_BROKER_URL)
+migrate = Migrate(db=db)
 
 # doing this workaround on circular imports
 # TODO: Make the modules less coupled
@@ -114,7 +116,7 @@ def app_factory(config: Config=devConfig) -> Flask:
     register_extensions(app)
     register_blueprints(app)
     celery.conf.update(app.config)
-
+    
     return app
 
 
@@ -122,6 +124,7 @@ def register_extensions(app: Flask):
     db.init_app(app)
     bcrypt.init_app(app)
     jwt.init_app(app)
+    migrate.init_app(app)
     from app import uset
     configure_uploads(app, (uset))
 

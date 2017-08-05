@@ -82,7 +82,9 @@ class StreamModel(db.Model, SurrogatePK):
     admin = relationship(UserModel, backref=db.backref('streams'))
     adminid = reference_col('users')
     stype = Column(db.String(80), nullable=False)
-
+    created_at = Column(db.DateTime, nullable=False,
+                        default=dt.datetime.utcnow)
+    
     def __init__(self, name, password, **kwargs):
         super().__init__(name=name, password=password, **kwargs)
 
@@ -95,6 +97,8 @@ class JobModel(db.Model):
     streamid = reference_col('streams')
     admin = relationship(UserModel, backref=db.backref('jobs'))
     adminid = reference_col('users')
+    done = Column(db.Boolean, default=False)
+    streamstart = Column(db.DateTime, nullable=False)
 
     def __init__(self, streamid, adminid, **kwargs):
         super().__init__(streamid=streamid, adminid=adminid, **kwargs)

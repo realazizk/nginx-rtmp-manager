@@ -113,8 +113,8 @@ def authorize():
 @use_kwargs(JobSchema)
 @marshal_with(JobSchema)
 @errorize
-def newjob(stream, username):
-    stream = StreamModel.query.filter_by(name=stream)
+def newjob(stream):
+    stream = StreamModel.query.filter_by(name=stream).first()
     if not stream:
         raise ValidationError('Submit a valid stream faggot')
     job = JobModel(streamid=stream.id, adminid=current_identity.id)

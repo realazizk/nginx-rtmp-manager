@@ -19,6 +19,7 @@ from injector import (app_factory,
 from os import environ
 from distutils import util
 import flask
+from flask_migrate import MigrateCommand
 
 
 isdebug = util.strtobool(environ.get('DEV', None))
@@ -103,6 +104,7 @@ else:
     server = GunicornServer()
 
 manager.add_command("runserver", server)
+manager.add_command('db', MigrateCommand)
 
 
 def drop_into_pdb(app, exception):
