@@ -12,8 +12,8 @@ import logging
 from flask_jwt import (current_identity,
                        jwt_required)
 from flask_uploads import UploadSet, AUDIO
+from models import (UserModel, JobModel, StreamModel)
 from tasks.stream import play_task
-from models import (JobModel, StreamModel, UserModel)
 from serializers import StreamsSchema, JobSchema, UserSchema, StreamSchema
 
 
@@ -117,6 +117,8 @@ def newjob(stream):
     stream = StreamModel.query.filter_by(name=stream).first()
     if not stream:
         raise ValidationError('Submit a valid stream faggot')
-    job = JobModel(streamid=stream.id, adminid=current_identity.id)
-    task = play_task.apply_async(job, countdown=10)
+    job = JobModel.create(streamid=stream.id, adminid=current_identity.id)
+    instancejs = JobSchema()
+    result = instancejs.dump(job)
+    task = play_task.apply_async(kwargs=result.data, countdown=10, serializers="json")
     return job

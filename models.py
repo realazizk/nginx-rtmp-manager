@@ -1,9 +1,10 @@
-from injector import db, bcrypt
+from extensions import db, bcrypt
 import datetime as dt
 from flask_jwt import _default_jwt_encode_handler
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import relationship
 from compat import basestring
+from sqlalchemy.sql import func
 
 
 ###
@@ -82,23 +83,21 @@ class StreamModel(db.Model, SurrogatePK):
     admin = relationship(UserModel, backref=db.backref('streams'))
     adminid = reference_col('users')
     stype = Column(db.String(80), nullable=False)
-    created_at = Column(db.DateTime, nullable=False,
-                        default=dt.datetime.utcnow)
+    created_at = Column(db.DateTime, default=func.now())
     
     def __init__(self, name, password, **kwargs):
         super().__init__(name=name, password=password, **kwargs)
 
 
-class JobModel(db.Model):
+class JobModel(db.Model, SurrogatePK):
     __tablename__ = 'jobs'
-    id = Column(db.String(80), primary_key=True)
     filename = Column(db.String(100))
     stream = relationship(StreamModel, backref=db.backref('jobs'))
     streamid = reference_col('streams')
     admin = relationship(UserModel, backref=db.backref('jobs'))
     adminid = reference_col('users')
     done = Column(db.Boolean, default=False)
-    streamstart = Column(db.DateTime, nullable=False)
+    streamstart = Column(db.DateTime, nullable=False, default=func.now())
 
     def __init__(self, streamid, adminid, **kwargs):
         super().__init__(streamid=streamid, adminid=adminid, **kwargs)

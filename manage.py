@@ -11,11 +11,10 @@ from flask_script import (Manager,
                           Server,
                           Command,
                           Option)
-from injector import (app_factory,
-                      devConfig,
-                      db,
-                      prodConfig,
-                      UserModel)
+from injector import app_factory
+from extensions import db
+from models import UserModel
+from settings import devConfig
 from os import environ
 from distutils import util
 import flask

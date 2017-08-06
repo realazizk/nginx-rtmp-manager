@@ -22,10 +22,9 @@ class StreamSchema(Schema):
 
 
 class JobSchema(Schema):
-    stream = fields.Str(required=True)
-    user = fields.Nested(UserSchema, dump_only=True)
+    stream = fields.Nested(StreamSchema, only='name', required=True)
     filename = fields.Str()
-    id = fields.Str()
+    id = fields.Str(load_only=True)
 
     @validates('stream')
     def validate_stream(self, stream):

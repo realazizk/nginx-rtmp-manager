@@ -5,104 +5,14 @@ Copyright Mohamed Aziz knani <medazizknani@gmai.com> 2017
 """
 
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy, Model
-from flask_bcrypt import Bcrypt
-from flask_jwt import JWT
-from flask_cors import CORS
-import os
-from datetime import timedelta
-from celery import Celery
 from flask_uploads import configure_uploads
-from flask_migrate import Migrate
-
-
-###
-# The configuration objects
-###
-
-class Config:
-    SECRET_KEY = os.environ.get('APP_SECRET', 'secret-key')
-    APP_DIR = os.path.abspath(os.path.dirname(__file__))
-    PROJECT_ROOT = os.path.abspath(os.path.join(APP_DIR, os.pardir))
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
-    BCRYPT_LOG_ROUNDS = 13
-    JWT_AUTH_USERNAME_KEY = 'username'
-    JWT_AUTH_HEADER_PREFIX = 'Token'
-    CELERY_RESULT_BACKEND = 'redis://localhost:6379'
-    CELERY_BROKER_URL = 'redis://localhost:6379'
-    CELERY_IMPORTS = ['tasks.stream']
-    UPLOADS_DEFAULT_DEST = '/tmp/'
-    UPLOADS_DEFAULT_URL = 'example'
-
-class devConfig(Config):
-    """
-    The development configuration
-    """
-    DB_NAME = 'dev.db'
-    DB_PATH = os.path.join(os.path.expanduser('~'), DB_NAME)
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///{0}'.format(DB_PATH)
-    JWT_EXPIRATION_DELTA = timedelta(10**6)  # for easier testing
-
-
-class prodConfig(Config):
-    """
-    The production configuration
-    """
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL',
-                                             'postgresql://localhost/example')
-
+from settings import devConfig, Config
+from extensions import db, bcrypt, jwt, migrate, cors, celery
 
 ###
 # Extension stuff
 ###
 
-class CRUDMixin(Model):
-    @classmethod
-    def create(cls, **kwargs):
-        """Create a new record and save it the database."""
-        instance = cls(**kwargs)
-        return instance.save()
-
-    def update(self, commit=True, **kwargs):
-        """Update specific fields of a record."""
-        for attr, value in kwargs.items():
-            setattr(self, attr, value)
-        return commit and self.save() or self
-
-    def save(self, commit=True):
-        """Save the record."""
-        db.session.add(self)
-        if commit:
-            db.session.commit()
-        return self
-
-    def delete(self, commit=True):
-        """Remove the return ecord from the database."""
-        db.session.delete(self)
-        return commit and db.session.commit()
-
-
-def jwt_identity(payload):
-    user_id = payload['identity']
-    return UserModel.get_by_id(user_id)
-
-
-def authenticate(email, password):
-    user = UserModel.query.filter_by(email=email).first()
-    if user and user.check_password(password):
-        return user
-
-
-db = SQLAlchemy(model_class=CRUDMixin)
-bcrypt = Bcrypt()
-cors = CORS()
-celery = Celery(__name__, broker=Config.CELERY_BROKER_URL)
-migrate = Migrate(db=db)
-
-# doing this workaround on circular imports
-# TODO: Make the modules less coupled
-from app import UserModel # noqa
-jwt = JWT(authentication_handler=authenticate, identity_handler=jwt_identity)
 
 
 ###
