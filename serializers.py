@@ -1,7 +1,11 @@
-from marshmallow import Schema, fields, validates
-from marshmallow.exceptions import ValidationError
+"""
+Audio Stream Manager
+Copyright Mohamed Aziz knani <medazizknani@gmai.com> 2017
+
+"""
+
+from marshmallow import Schema, fields
 from marshmallow.validate import OneOf
-from models import StreamModel
 
 
 ###
@@ -24,12 +28,8 @@ class StreamSchema(Schema):
 class JobSchema(Schema):
     stream = fields.Nested(StreamSchema, only='name', required=True)
     filename = fields.Str()
+    begin_date = fields.DateTime()
     id = fields.Str(load_only=True)
-
-    @validates('stream')
-    def validate_stream(self, stream):
-        if not StreamModel.query.filter_by(name=stream):
-            raise ValidationError('Pass a valid stream name')
 
 
 StreamsSchema = StreamSchema(many=True)

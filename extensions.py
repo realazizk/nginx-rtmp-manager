@@ -39,6 +39,7 @@ cors = CORS()
 celery = Celery(__name__, broker=Config.CELERY_BROKER_URL)
 migrate = Migrate(db=db)
 
+
 def jwt_identity(payload):
     user_id = payload['identity']
     return UserModel.get_by_id(user_id)
@@ -48,5 +49,7 @@ def authenticate(email, password):
     user = UserModel.query.filter_by(email=email).first()
     if user and user.check_password(password):
         return user
+
+from models import UserModel # noqa
 
 jwt = JWT(authentication_handler=authenticate, identity_handler=jwt_identity)

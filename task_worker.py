@@ -1,5 +1,6 @@
 from os import environ
-from injector import (app_factory, devConfig, prodConfig)
+from injector import app_factory
+from settings import prodConfig, devConfig
 from distutils import util
 from injector import celery # noqa
 

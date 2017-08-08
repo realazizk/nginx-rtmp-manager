@@ -86,7 +86,7 @@ class GunicornServer(Command):
 
 
 if isdebug:
-    server = Server(host="0.0.0.0", port=5000, use_reloader=True, use_debugger=True)
+    server = Server(host="0.0.0.0", port=5000, use_reloader=True)
 else:
     server = GunicornServer()
 

@@ -10,7 +10,6 @@
             </a>
         </ul>
 
-        <audio id="audio"></audio>
     </div>
 </template>
 

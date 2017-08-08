@@ -56,7 +56,7 @@ cd /app
 
 cp -r nginx.conf /home/vagrant/.local/conf/nginx.conf
 
-sudo apt-get install libyaml-dev libffi-dev -y
+sudo apt-get install pkg-config libavresample-dev libavdevice-dev libavfilter-dev libswscale-dev libyaml-dev libffi-dev -y
 
 curl -sL https://deb.nodesource.com/setup_7.x | sudo -E bash -
 

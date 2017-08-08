@@ -1,3 +1,9 @@
+"""
+Audio Stream Manager
+Copyright Mohamed Aziz knani <medazizknani@gmai.com> 2017
+
+"""
+
 import os
 from datetime import timedelta
 
@@ -18,8 +24,8 @@ class Config:
     CELERY_RESULT_BACKEND = 'redis://localhost:6379'
     CELERY_BROKER_URL = 'redis://localhost:6379'
     CELERY_IMPORTS = ['tasks.stream']
-    UPLOADS_DEFAULT_DEST = '/tmp/'
-    UPLOADS_DEFAULT_URL = 'example'
+    UPLOAD_FOLDER = '/tmp'
+    STREAM_HOST = 'localhost'
 
 
 class devConfig(Config):

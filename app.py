@@ -11,16 +11,17 @@ from functools import wraps
 import logging
 from flask_jwt import (current_identity,
                        jwt_required)
-from flask_uploads import UploadSet, AUDIO
 from models import (UserModel, JobModel, StreamModel)
-from tasks.stream import play_task
+from tasks.stream import play_audio_task
 from serializers import StreamsSchema, JobSchema, UserSchema, StreamSchema
+from werkzeug.utils import secure_filename
+from utils import allowed_file
+import settings
+import os
+import av
 
 
 bp = Blueprint(__name__.split('.')[0], import_name='app')
-
-
-uset = UploadSet('files', AUDIO)
 
 
 ###
@@ -93,12 +94,20 @@ def streams():
     return StreamModel.query.all()
 
 
-@bp.route('/api/uploadfile/<jobid>', methods=('POST',))
-def fileupload(jobid):
-    # mfile = uset.save(request.files['file'])
-    pass
-    # update job with file
-    
+@bp.route('/api/upload', methods=('POST',))
+@jwt_required()
+@errorize
+def fileupload():
+    file = request.files['file_data']
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        pth = os.path.join(settings.Config.UPLOAD_FOLDER, filename)
+        file.save(pth)
+        container = av.open(pth)
+        return jsonify(dict(uploaded='OK',
+                            duration=container.duration / av.time_base))
+    return jsonify(dict(uploaded='ERROR'))
+
 
 @bp.route('/auth', methods=('GET',))
 def authorize():
@@ -113,12 +122,13 @@ def authorize():
 @use_kwargs(JobSchema)
 @marshal_with(JobSchema)
 @errorize
-def newjob(stream):
-    stream = StreamModel.query.filter_by(name=stream).first()
+def newjob(stream, filename, begin_date):
+    stream = StreamModel.query.filter_by(name=stream['name']).first()
     if not stream:
+        # BUG here debug the traceback
         raise ValidationError('Submit a valid stream faggot')
     job = JobModel.create(streamid=stream.id, adminid=current_identity.id)
     instancejs = JobSchema()
     result = instancejs.dump(job)
-    task = play_task.apply_async(kwargs=result.data, countdown=10, serializers="json")
+    task = play_audio_task.apply_async(kwargs=result.data, countdown=10, serializers="json")
     return job

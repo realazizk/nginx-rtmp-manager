@@ -1,5 +1,6 @@
 from extensions import celery
-from time import sleep
+from ffmpy import FFmpeg
+import settings
 
 ###
 # Stream tasks
@@ -7,10 +8,16 @@ from time import sleep
 
 
 @celery.task(ignore_result=True)
-def play_task(*a, **kw):
-    print(kw)
-    print(job)
-    print('SLEEPing')
-    sleep(10)
-    print('WAKING')
-
+def play_audio_task(*a, **kw):
+    f = FFmpeg(
+        inputs={
+            kw['filename']: ['-re']
+        },
+        outputs={
+            'rtmp://{host}:1935/stream/{stream}'.format(
+                stream=kw['stream'],
+                host=settings.Config.STREAM_HOST
+            ): ['-vn', '-c:a', 'aac', '-f', 'flv']
+        }
+    )
+    f.run()

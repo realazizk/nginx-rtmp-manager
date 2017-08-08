@@ -90,26 +90,29 @@
   <div slot="body">
     <form action="">
       <label for="fileinput">The file (can convert video to audio only)</label>
-      <input id="fileinput" type="file" class="file">
+      <input id="fileinput" type="file" class="file" v-on:change="uploadFile">
       
       <div class="form-group">
 	<label for="dtinput1">Enter date</label>
 	<div class='input-group date' id='datetimepicker1'>
 	  
-          <input id="dtinput1" type='text' class="form-control" />
+          <input v-bind:disabled="job.activate" id="dtinput1" type='text' class="form-control" />
           <span class="input-group-addon">
             <span class="glyphicon glyphicon-calendar"></span>
           </span>
+
+	  <input style='margin-left: 10px' disabled="true" id="dtinput2" type='text' class="form-control" />
+
 	</div>
       </div>
       <label for="selst">Select the channel to stream to</label>
-      <select v-model="job.sname"  class="form-control" id="selst">
+      <select v-model="job.sname" v-bind:disabled="job.activate"  class="form-control" id="selst">
         <option v-for="stream in job.streams">
           {{stream.name}}
         </option>
       </select>
 
-      <button type="submit" class="btn btn-default "  @click="submitjob()">Submit</button>
+      <button type="submit" class="btn btn-default " v-bind:disabled="job.activate" @click="submitjob()">Submit</button>
 
     </form>
   </div>
@@ -139,7 +142,9 @@ export default {
       },
       job: {
         streams: [],
-        sname: ''
+        sname: '',
+	activate: true,
+	fileduration: 0 // in seconds
       },
 
     }
@@ -157,6 +162,10 @@ export default {
 
     submitjob() {
 
+    },
+
+    uploadFile(ev) {
+      console.log('ev')
     },
 
     submitstream () {
@@ -198,6 +207,29 @@ export default {
       $('#datetimepicker1').datetimepicker({
 	minDate:new Date()
       });
+    });
+
+    var input = $("#fileinput");
+    input.fileinput({
+      uploadUrl: "http://localhost:8080/api/upload",
+      maxFileCount: 1,
+      showUpload: false,
+      showRemove: false,
+      ajaxSettings: {'headers': {'Authorization': 'Token ' + localStorage.getItem('id_token')}}
+    }).on("filebatchselected", function(event, files) {
+      // trigger upload method immediately after files are selected
+      input.fileinput("upload");
+    })
+
+    var vue = this
+    $('#fileinput').on('fileuploaded', function(event, data, previewId, index) {
+      var form = data.form, files = data.files, extra = data.extra, 
+	  response = data.response, reader = data.reader;
+      let duration = response.duration
+      console.log(date)
+      console.log(vue.job)
+      vue.job.activate = false
+      vue.job.fileduration = duration
     });
   }
 }

@@ -1,3 +1,9 @@
+///
+// Audio Stream Manager
+// Copyright Mohamed Aziz knani <medazizknani@gmai.com> 2017/
+///
+
+
 import router from '@/router'
 
 const API_URL = 'http://localhost:8080/'
