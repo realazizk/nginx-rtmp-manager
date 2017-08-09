@@ -6,7 +6,7 @@ Copyright Mohamed Aziz knani <medazizknani@gmai.com> 2017
 
 from flask import Flask
 from settings import devConfig, Config
-from extensions import db, bcrypt, jwt, migrate, cors, celery
+from extensions import (db, bcrypt, jwt, migrate, cors, celery, redis_store)
 
 
 def app_factory(config: Config=devConfig) -> Flask:
@@ -24,6 +24,7 @@ def register_extensions(app: Flask):
     bcrypt.init_app(app)
     jwt.init_app(app)
     migrate.init_app(app)
+    redis_store.init_app(app)
 
 
 def register_blueprints(app: Flask):

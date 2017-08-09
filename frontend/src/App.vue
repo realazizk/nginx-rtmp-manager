@@ -96,14 +96,13 @@
 	<label for="dtinput1">Enter date</label>
 	<div class='input-group date' id='datetimepicker1'>
 	  
-          <input v-bind:disabled="job.activate" id="dtinput1" type='text' class="form-control" />
+          <input v-bind:disabled="job.activate"  id="dtinput1" type='text' class="form-control" />
           <span class="input-group-addon">
             <span class="glyphicon glyphicon-calendar"></span>
           </span>
 
-	  <input style='margin-left: 10px' disabled="true" id="dtinput2" type='text' class="form-control" />
-
 	</div>
+	<input disabled="true" v-model="datefinish" id="dtinput2" type='text' class="form-control" />
       </div>
       <label for="selst">Select the channel to stream to</label>
       <select v-model="job.sname" v-bind:disabled="job.activate"  class="form-control" id="selst">
@@ -128,6 +127,7 @@
 import auth from '@/auth'
 const API_URL = 'http://localhost:8080/'
 const STREAM_ADD_URL = API_URL + 'api/stream'
+const JOB_ADD_URL = API_URL + 'api/job'
 
 
 export default {
@@ -144,9 +144,11 @@ export default {
         streams: [],
         sname: '',
 	activate: true,
-	fileduration: 0 // in seconds
+	fileduration: 0, // in seconds
+	filehash: ''
       },
-
+      inputdatejob: '',
+      datefinish: ''
     }
   },
   methods: {
@@ -160,9 +162,6 @@ export default {
       auth.logout()
     },
 
-    submitjob() {
-
-    },
 
     uploadFile(ev) {
       console.log('ev')
@@ -183,6 +182,28 @@ export default {
 
           // error callback
         })
+    },
+
+    submitjob () {
+      console.log(this.inputdatejob)
+      var data = {
+	stream: {
+	  name: this.job.sname
+	},
+	filename: this.job.filehash,
+	begin_date: $("#datetimepicker1").data("DateTimePicker").date().toDate()
+      }
+
+      var modal = this.$refs.addJob
+      this.$http.post(JOB_ADD_URL, data, {headers: auth.getAuthHeader()})
+        .then(response => {
+          let data = response.data
+          modal.close()
+        },response => {
+
+          // error callback
+        })
+
     }
 
   },
@@ -202,12 +223,16 @@ export default {
     )
 
   },
+
   mounted () {
-    $(function () {
-      $('#datetimepicker1').datetimepicker({
-	minDate:new Date()
-      });
-    });
+    
+    $('#datetimepicker1').datetimepicker({
+      minDate:new Date()
+    }).on("dp.change", (dt, oldDate) => {
+      let date = dt.date.toDate()
+      this.datefinish = new Date(date.getTime() + 1000 * this.job.fileduration)
+    })
+    
 
     var input = $("#fileinput");
     input.fileinput({
@@ -226,10 +251,10 @@ export default {
       var form = data.form, files = data.files, extra = data.extra, 
 	  response = data.response, reader = data.reader;
       let duration = response.duration
-      console.log(date)
-      console.log(vue.job)
+      let filehash = response.hashid
       vue.job.activate = false
       vue.job.fileduration = duration
+      vue.job.filehash = filehash
     });
   }
 }

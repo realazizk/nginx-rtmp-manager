@@ -8,16 +8,16 @@ import settings
 
 
 @celery.task(ignore_result=True)
-def play_audio_task(*a, **kw):
+def play_audio_task(filename, stream, *a, **kw):
     f = FFmpeg(
         inputs={
-            kw['filename']: ['-re']
+            filename: ['-re']
         },
         outputs={
             'rtmp://{host}:1935/stream/{stream}'.format(
-                stream=kw['stream'],
+                stream=stream,
                 host=settings.Config.STREAM_HOST
-            ): ['-vn', '-c:a', 'aac', '-f', 'flv']
+            ): ['-vn', '-c:a', 'aac', '-strict',  '-2', '-f', 'flv']
         }
     )
     f.run()

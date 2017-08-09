@@ -4,6 +4,7 @@ from flask_jwt import JWT
 from flask_cors import CORS
 from celery import Celery
 from flask_migrate import Migrate
+from flask_redis import FlaskRedis
 from settings import Config
 
 
@@ -38,7 +39,7 @@ bcrypt = Bcrypt()
 cors = CORS()
 celery = Celery(__name__, broker=Config.CELERY_BROKER_URL)
 migrate = Migrate(db=db)
-
+redis_store = FlaskRedis()
 
 def jwt_identity(payload):
     user_id = payload['identity']

@@ -23,6 +23,7 @@ class Config:
     JWT_AUTH_HEADER_PREFIX = 'Token'
     CELERY_RESULT_BACKEND = 'redis://localhost:6379'
     CELERY_BROKER_URL = 'redis://localhost:6379'
+    REDIS_URL = 'redis://localhost:6379/0'
     CELERY_IMPORTS = ['tasks.stream']
     UPLOAD_FOLDER = '/tmp'
     STREAM_HOST = 'localhost'
