@@ -28,18 +28,6 @@ bp = Blueprint(__name__.split('.')[0], import_name='app')
 
 
 ###
-# Logging
-###
-
-log = logging.getLogger('werkzeug')
-log.setLevel(logging.INFO)
-handler = logging.StreamHandler()
-formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-handler.setFormatter(formatter)
-log.addHandler(handler)
-
-
-###
 # Wrappers
 ###
 
@@ -62,7 +50,6 @@ def errorize(func):
 @bp.route('/api/login', methods=('POST',))
 @use_kwargs(UserSchema)
 @marshal_with(UserSchema)
-@errorize
 def login(username=None, password=None):
     if not username or not password:
         raise ValidationError("Specify username and password fields")
@@ -77,7 +64,6 @@ def login(username=None, password=None):
 @jwt_required()
 @use_kwargs(StreamSchema)
 @marshal_with(StreamSchema)
-@errorize
 def make_stream(name=None, password=None, stype=None):
     if not name or not password or not stype:
         raise ValidationError("Specify name, password and stream type fields")
@@ -98,7 +84,6 @@ def streams():
 
 @bp.route('/api/upload', methods=('POST',))
 @jwt_required()
-@errorize
 def fileupload():
     file = request.files['file_data']
     if file and allowed_file(file.filename):
@@ -129,15 +114,16 @@ def authorize():
 @jwt_required()
 @use_kwargs(JobSchema)
 @marshal_with(JobSchema)
-@errorize
 def newjob(stream, filename, begin_date):
     stream = StreamModel.query.filter_by(name=stream['name']).first()
     if not stream:
         # BUG here debug the traceback
-        raise ValidationError('Submit a valid stream faggot')
+        raise InvalidUsage.stream_not_found()
+
     fpth = redis_store.get(filename)
     if not fpth:
         raise InvalidUsage.file_not_found()
+
     job = JobModel.create(streamid=stream.id,
                           adminid=current_identity.id, filename=fpth)
     instancejs = JobSchema()

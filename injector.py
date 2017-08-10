@@ -7,6 +7,8 @@ Copyright Mohamed Aziz knani <medazizknani@gmai.com> 2017
 from flask import Flask
 from settings import devConfig, Config
 from extensions import (db, bcrypt, jwt, migrate, cors, celery, redis_store)
+from exceptions import InvalidUsage
+import logging
 
 
 def app_factory(config: Config=devConfig) -> Flask:
@@ -16,6 +18,23 @@ def app_factory(config: Config=devConfig) -> Flask:
     register_extensions(app)
     register_blueprints(app)
     celery.conf.update(app.config)
+
+    file_handler = logging.FileHandler('log.0')
+    formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+    file_handler.setFormatter(formatter)
+    loggers = [app.logger, logging.getLogger('sqlalchemy'),
+               logging.getLogger('werkzeug')]
+
+    for logger in loggers:
+        logger.addHandler(file_handler)
+
+    @app.errorhandler(InvalidUsage)
+    def handle_invalid_usage(error):
+        app.logger.error(error)
+        response = error.to_json()
+        response.status_code = error.status_code
+        return response
+
     return app
 
 
