@@ -13,6 +13,8 @@ import 'bootstrap'
 import 'bootstrap-fileinput'
 import dateTimePicker from 'eonasdan-bootstrap-datetimepicker'
 import 'eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.css'
+import './assets/player.css'
+
 
 let bs_modal = require('vue2-bootstrap-modal')
 

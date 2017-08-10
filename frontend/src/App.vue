@@ -30,7 +30,6 @@
 </ul>
 
 
-
 <ul class="nav navbar-nav navbar-right">
   <template v-if="!user.authenticated">
     <router-link active-class="active" tag="li" to="login">
@@ -51,6 +50,22 @@
 </nav>
 
 
+<div class="customAudioPlayer loading player_0 pitchfork" data-song-index="0">
+  <div class="loader"></div><button v-bind:class="playerm.pclass" v-on:click="toggleplaying" class="playerTrigger"><span class="buttonText">play</span></button>
+  <div class="metaWrapper"><span class="titleDisplay">{{playerm.title}}</span><span class="artistDisplay"></span></div>
+  <div class="timingsWrapper"><span class="songPlayTimer">0:00</span>
+    <div class="songProgressSliderWrapper">
+      <div class="pseudoProgressBackground"></div>
+      <div class="pseudoProgressIndicator"></div>
+      <div class="pseudoProgressPlayhead"></div><input type="range" min="0" max="100" class="songProgressSlider"></div><span class="songDuration">-:--</span></div>
+  <div class="songVolume"><button class="songMuteButton">Mute</button>
+    <div class="songVolumeLabelWrapper"><span class="songVolumeLabel">Volume</span><span class="songVolumeValue">10</span></div>
+    <div class="songVolumeSliderWrapper">
+      <div class="pseudoVolumeBackground"></div>
+      <div class="pseudoVolumeIndicator"></div>
+      <div class="pseudoVolumePlayhead"></div><input type="range" min="0" max="1" step="0.1" class="songVolumeSlider"></div>
+  </div>
+</div>
 
 
 <router-view></router-view>
@@ -125,12 +140,15 @@
 
 <script>
 import auth from '@/auth'
+import Home from '@/components/Home'
+import bus from '@/eventbus.js'
+
 const API_URL = 'http://localhost:8080/'
 const STREAM_ADD_URL = API_URL + 'api/stream'
 const JOB_ADD_URL = API_URL + 'api/job'
 
 
-export default {
+let component =  {
   name: 'app',
   data() {
     return {
@@ -147,11 +165,28 @@ export default {
 	fileduration: 0, // in seconds
 	filehash: ''
       },
+      playerm: {
+	playing: false,
+	pclass: 'songPaused',
+	title: 'Not playing'
+      },
       inputdatejob: '',
-      datefinish: ''
+      datefinish: '',
     }
   },
   methods: {
+    
+    toggleplaying (event) {
+      this.playerm.playing = !this.playerm.playing
+       if (this.playerm.playing) {
+	 this.playerm.pclass = 'songPlaying'
+       } else {
+	 this.playerm.pclass = 'songPaused'
+       }
+      bus.$emit('toggle-playing',
+		this.playerm.playing,
+		this.playerm.title)
+    },
     opentheModal() {
       this.$refs.addstream.open()
     },
@@ -162,7 +197,17 @@ export default {
       auth.logout()
     },
 
-
+    isplaying (s) {
+      return this.playerm.title !== s
+    }
+    
+    startplaying (s) {
+      let olds = this.playerm.title
+      this.playerm.title = s
+      this.playerm.pclass = 'songPlaying'
+      if (isplaying(olds))
+	this.toggleplaying(null)
+    },
     uploadFile(ev) {
       console.log('ev')
     },
@@ -221,6 +266,9 @@ export default {
         this.job.streams = data
       }
     )
+    bus.$on('splaying', (s) => {
+      this.startplaying(s)
+    })
 
   },
 
@@ -258,6 +306,10 @@ export default {
     });
   }
 }
+
+
+export default component
+
 </script>
 
 <style>

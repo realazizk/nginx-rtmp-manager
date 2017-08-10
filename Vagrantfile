@@ -13,6 +13,7 @@ Vagrant.configure("2") do |config|
   config.vm.synced_folder ".", "/audio_stream"
   config.vm.network "forwarded_port", guest: 5000, host: 8080
   config.vm.network "forwarded_port", guest: 8080, host: 8090
+  config.vm.network "forwarded_port", guest: 80, host: 9002
   config.vm.provider 'virtualbox'  do  |v|
     v.customize ["modifyvm", :id, "--memory", 2048]
     v.customize ["modifyvm", :id, "--cpus", 2]

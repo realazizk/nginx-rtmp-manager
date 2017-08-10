@@ -22,7 +22,11 @@
         //      width: 640,
         //      height: 40
       });
+      console.log('F')
+    },
 
+    mounted() {
+      console.log($('.titleDisplay'))
     }
   }
 </script>
