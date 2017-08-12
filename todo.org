@@ -1,19 +1,15 @@
-So I want to implement some type of a stream manager.
 
-The goal of this solution is to solve the problem of
-streaming live audio to subscribers, this should
-handle more than 5K concurrent users.
 
-The first iteration of this project was implemented
-using a twisted protocol (RTMP).
+* TODO [#A] Organize the backend code
 
-I ended up using Nginx server using RTMP protocol and then
-activate HLS to stream using a browser plugin (because flash sucks, fuck you adobe).
+* TODO [#A] Add an RTMP login system
 
-No need to edit the nginx config on the fly and send signals to it
-just do the login in the application level.
+* TODO [#A] Add an admin system
 
-* TODO [#A] Implement some type of authentication.
-* TODO [#B] Implement an interface to display beautiful graphs and some stats.
-* DONE [#A] Implement feature to create room + register to admin.
-* TODO [#A] Implement a job schduler.
+* TODO [#B] Add user stream managment
+
+* TODO [#B] Add multiple job scheduling
+
+* TODO [#B] Add inf loop feature
+
+* TODO [#B] Add cron job features (repeat every)
