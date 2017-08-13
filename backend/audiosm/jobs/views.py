@@ -5,7 +5,6 @@ import av
 from flask import Blueprint, jsonify, request
 from flask_apispec import marshal_with, use_kwargs
 from flask_jwt import current_identity, jwt_required
-from werkzeug.utils import secure_filename
 
 from audiosm import settings
 from audiosm.exceptions import InvalidUsage
@@ -25,13 +24,12 @@ bp = Blueprint('jobs', __name__)
 def fileupload():
     file = request.files['file_data']
     if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)
-        pth = os.path.join(settings.Config.UPLOAD_FOLDER, filename)
         f = MyBuffer(file.read())
-        f.save(pth)
-        m = hashlib.md5()
+        m = hashlib.sha256()
         m.update(f.getvalue())
         hashid = m.hexdigest()
+        pth = os.path.join(settings.Config.UPLOAD_FOLDER, hashid)
+        f.save(pth)
         redis_store.set(hashid, pth)
         container = av.open(pth)
         return jsonify(dict(uploaded='OK',
