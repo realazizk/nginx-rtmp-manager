@@ -7,7 +7,7 @@
 	<!--      {{channel.name}} <span class="badge">{{channel.stype}}</span> -->
 	<!-- </router-link> -->
 	<a class="list-group-item" v-for="channel in channels" v-on:click="play(channel)">
-          {{channel.name}} <span class="badge">{{channel.stype}}</span>
+          {{channel.name}}  <span class="badge">{{channel.stype}}</span> <span v-if="channel.live" style="background-color: #d41818" class="badge">live</span>
 	</a>
       </ul>  
     </div>
@@ -25,48 +25,69 @@ var component = {
   data() {
       return {
         channels: [],
-        player: null
+        player: null,
+	isplaying: localStorage.getItem('isplaying')
       }
     },
    methods: {
      play (stream) {
        let audio = document.getElementById('audio');
-       this.player.attachMedia(audio);
-       this.player.loadSource('http://192.168.100.2/stream/' +stream.name+ '.m3u8');
-       this.player.on(Hls.Events.MANIFEST_PARSED, function() {
-	 bus.$emit('splaying', stream.name)
-       });
-     }
+       if (audio.paused || stream.name !== this.isplaying) {
+	 
+	 this.player.attachMedia(audio);
+	 this.player.loadSource('http://192.168.100.2/stream/' +stream.name+ '.m3u8');
+	 bus.$emit('setplaying', stream.name)
+	 this.toggleplaying(false)
 
-     ,toggleplaying (truth) {
-       if (truth) {
-	 console.log('play')
-	 audio.play();
-       } else {
-	 console.log('play')
-	 audio.pause();
+	 this.isplaying = stream.name
+	 localStorage.setItem('isplaying', stream.name)
+	 let vm = this
+	 this.player.on(Hls.Events.MANIFEST_PARSED, function() {
+	   bus.$emit('splaying', stream.name)
+	   vm.toggleplaying(true, stream.name)
+ 	 });
        }
      }
 
+     ,toggleplaying (truth) {
+       let audio = document.getElementById('audio')
+       let vm = this
+       setTimeout( () => {
+	 if (truth) {
+	   audio.play();
+	 } else {
+	   audio.pause();
+	 }}, 150)
+     }
+     
    },
 
    created() {
-      this.$http.get(API_URL + 'api/streams').then(
+     let vm = this
+     this.$http.get(API_URL + 'api/streams').then(
         response => {
           let data = response.body
           this.channels = data
+	  console.log(this.channels)
+
+	  this.channels.forEach(function (item, index, array){
+	    vm.$http.get(
+	      'http://192.168.100.2/stream/' +item.name+ '.m3u8'
+	    ).then(response => {
+	      item.live = true
+	      vm.$set(array[index], item)
+	    }, response => {
+	      item.live = false
+	      vm.$set(array[index], item)
+
+	    })
+	  })
         }
       )
 
       if(Hls.isSupported()) {
         this.player = new Hls();
       }
-
-     $('.titleDisplay').text('Not playing')
-
-     bus.$on('toggle-playing', (a) => {
-       this.toggleplaying(a)
-     })
    },
 
 }

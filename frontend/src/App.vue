@@ -175,17 +175,19 @@ let component =  {
     }
   },
   methods: {
+
+    setplaying (stream) {
+      this.playerm.title = stream
+      this.playerm.pclass = 'songPaused'
+    },
     
     toggleplaying (event) {
       this.playerm.playing = !this.playerm.playing
        if (this.playerm.playing) {
-	 this.playerm.pclass = 'songPlaying'
+	   this.playerm.pclass = 'songPlaying'
        } else {
 	 this.playerm.pclass = 'songPaused'
        }
-      bus.$emit('toggle-playing',
-		this.playerm.playing,
-		this.playerm.title)
     },
     opentheModal() {
       this.$refs.addstream.open()
@@ -197,19 +199,14 @@ let component =  {
       auth.logout()
     },
 
-    isplaying (s) {
-      return this.playerm.title !== s
-    }
-    
+
     startplaying (s) {
-      let olds = this.playerm.title
-      this.playerm.title = s
       this.playerm.pclass = 'songPlaying'
-      if (isplaying(olds))
-	this.toggleplaying(null)
+      this.playerm.title = s
+      this.playerm.playing = true
     },
     uploadFile(ev) {
-      console.log('ev')
+      // console.log('ev')
     },
 
     submitstream () {
@@ -230,7 +227,7 @@ let component =  {
     },
 
     submitjob () {
-      console.log(this.inputdatejob)
+      // console.log(this.inputdatejob)
       var data = {
 	stream: {
 	  name: this.job.sname

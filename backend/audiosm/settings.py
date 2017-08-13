@@ -24,7 +24,7 @@ class Config:
     CELERY_RESULT_BACKEND = 'redis://localhost:6379'
     CELERY_BROKER_URL = 'redis://localhost:6379'
     REDIS_URL = 'redis://localhost:6379/0'
-    CELERY_IMPORTS = ['tasks.stream']
+    CELERY_IMPORTS = ['audiosm.tasks.stream']
     UPLOAD_FOLDER = '/tmp'
     STREAM_HOST = 'localhost'
 
@@ -34,7 +34,7 @@ class devConfig(Config):
     The development configuration
     """
     DB_NAME = 'dev.db'
-    DB_PATH = os.path.join(os.path.expanduser('~'), DB_NAME)
+    DB_PATH = os.path.join(Config.PROJECT_ROOT, DB_NAME)
     SQLALCHEMY_DATABASE_URI = 'sqlite:///{0}'.format(DB_PATH)
     JWT_EXPIRATION_DELTA = timedelta(10**6)  # for easier testing
 

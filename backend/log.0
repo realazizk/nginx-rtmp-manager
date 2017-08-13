@@ -1,0 +1,47 @@
+2017-08-13 03:00:52,692 - werkzeug - INFO -  * Running on http://0.0.0.0:5000/ (Press CTRL+C to quit)
+2017-08-13 03:00:52,692 - werkzeug - INFO -  * Restarting with stat
+2017-08-13 03:03:48,890 - werkzeug - INFO -  * Running on http://0.0.0.0:5000/ (Press CTRL+C to quit)
+2017-08-13 03:03:48,890 - werkzeug - INFO -  * Restarting with stat
+2017-08-13 03:04:05,458 - werkzeug - INFO -  * Running on http://0.0.0.0:5000/ (Press CTRL+C to quit)
+2017-08-13 03:04:05,459 - werkzeug - INFO -  * Restarting with stat
+2017-08-13 03:05:34,581 - werkzeug - INFO -  * Detected change in '/home/mo/Projects/audio_stream/backend/audiosm/settings.py', reloading
+2017-08-13 03:05:34,679 - werkzeug - INFO -  * Restarting with stat
+2017-08-13 03:05:36,410 - werkzeug - INFO -  * Detected change in '/home/mo/Projects/audio_stream/backend/audiosm/settings.py', reloading
+2017-08-13 03:05:36,498 - werkzeug - INFO -  * Restarting with stat
+2017-08-13 03:05:42,015 - werkzeug - INFO -  * Running on http://0.0.0.0:5000/ (Press CTRL+C to quit)
+2017-08-13 03:05:42,015 - werkzeug - INFO -  * Restarting with stat
+2017-08-13 03:07:05,311 - werkzeug - INFO -  * Running on http://0.0.0.0:5000/ (Press CTRL+C to quit)
+2017-08-13 03:07:05,311 - werkzeug - INFO -  * Restarting with stat
+2017-08-13 03:08:02,393 - werkzeug - INFO -  * Running on http://0.0.0.0:5000/ (Press CTRL+C to quit)
+2017-08-13 03:08:02,393 - werkzeug - INFO -  * Restarting with stat
+2017-08-13 03:08:39,367 - werkzeug - INFO -  * Running on http://0.0.0.0:8080/ (Press CTRL+C to quit)
+2017-08-13 03:08:39,368 - werkzeug - INFO -  * Restarting with stat
+2017-08-13 03:08:45,538 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2017 03:08:45] "GET /api/streams HTTP/1.1" 200 -
+2017-08-13 03:08:46,849 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2017 03:08:46] "GET /api/streams HTTP/1.1" 200 -
+2017-08-13 03:08:52,129 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2017 03:08:52] "OPTIONS /api/login HTTP/1.1" 200 -
+2017-08-13 03:08:52,136 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2017 03:08:52] "POST /api/login HTTP/1.1" 400 -
+2017-08-13 03:08:52,332 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2017 03:08:52] "GET /api/streams HTTP/1.1" 200 -
+2017-08-13 03:08:56,192 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2017 03:08:56] "POST /api/login HTTP/1.1" 400 -
+2017-08-13 03:08:58,027 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2017 03:08:58] "OPTIONS /api/login HTTP/1.1" 200 -
+2017-08-13 03:08:58,033 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2017 03:08:58] "POST /api/login HTTP/1.1" 400 -
+2017-08-13 03:09:03,100 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2017 03:09:03] "OPTIONS /api/login HTTP/1.1" 200 -
+2017-08-13 03:09:03,107 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2017 03:09:03] "POST /api/login HTTP/1.1" 400 -
+2017-08-13 03:09:06,530 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2017 03:09:06] "POST /api/login HTTP/1.1" 400 -
+2017-08-13 03:09:08,111 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2017 03:09:08] "GET /api/streams HTTP/1.1" 200 -
+2017-08-13 03:09:10,080 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2017 03:09:10] "GET /api/streams HTTP/1.1" 200 -
+2017-08-13 03:09:15,707 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2017 03:09:15] "OPTIONS /api/login HTTP/1.1" 200 -
+2017-08-13 03:09:15,714 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2017 03:09:15] "POST /api/login HTTP/1.1" 400 -
+2017-08-13 03:09:17,438 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2017 03:09:17] "POST /api/login HTTP/1.1" 400 -
+2017-08-13 03:09:21,168 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2017 03:09:21] "OPTIONS /api/login HTTP/1.1" 200 -
+2017-08-13 03:09:21,174 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2017 03:09:21] "POST /api/login HTTP/1.1" 400 -
+2017-08-13 03:09:26,707 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2017 03:09:26] "OPTIONS /api/login HTTP/1.1" 200 -
+2017-08-13 03:09:26,715 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2017 03:09:26] "POST /api/login HTTP/1.1" 400 -
+2017-08-13 03:09:31,032 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2017 03:09:31] "POST /api/login HTTP/1.1" 400 -
+2017-08-13 03:09:33,527 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2017 03:09:33] "OPTIONS /api/login HTTP/1.1" 200 -
+2017-08-13 03:09:33,534 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2017 03:09:33] "POST /api/login HTTP/1.1" 400 -
+2017-08-13 03:15:01,760 - werkzeug - INFO -  * Running on http://0.0.0.0:8080/ (Press CTRL+C to quit)
+2017-08-13 03:15:01,761 - werkzeug - INFO -  * Restarting with stat
+2017-08-13 03:15:04,305 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2017 03:15:04] "OPTIONS /api/login HTTP/1.1" 200 -
+2017-08-13 03:15:04,872 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2017 03:15:04] "POST /api/login HTTP/1.1" 200 -
+2017-08-13 03:15:05,060 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2017 03:15:05] "GET /api/streams HTTP/1.1" 200 -
+2017-08-13 03:15:09,269 - werkzeug - INFO - 127.0.0.1 - - [13/Aug/2017 03:15:09] "GET /api/streams HTTP/1.1" 200 -

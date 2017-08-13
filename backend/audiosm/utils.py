@@ -1,5 +1,5 @@
 import io
-from compat import string_types
+from audiosm.compat import string_types
 
 ALLOWED_EXTENSIONS = set(['mp3', 'mp4', 'aac', 'opus', 'mkv', 'webm'])
 

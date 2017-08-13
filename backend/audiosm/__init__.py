@@ -4,11 +4,14 @@ Copyright Mohamed Aziz knani <medazizknani@gmai.com> 2017
 
 """
 
-from flask import Flask
-from settings import devConfig, Config
-from extensions import (db, bcrypt, jwt, migrate, cors, celery, redis_store)
-from exceptions import InvalidUsage
 import logging
+
+from flask import Flask
+
+from audiosm.exceptions import InvalidUsage
+from audiosm.extensions import (bcrypt, celery, cors, db, jwt, migrate,
+    redis_store)
+from audiosm.settings import devConfig, Config
 
 
 def app_factory(config: Config=devConfig) -> Flask:
@@ -47,9 +50,15 @@ def register_extensions(app: Flask):
 
 
 def register_blueprints(app: Flask):
-    from app import bp
-    # use cors
-    origins = app.config.get('CORS_ORIGIN_WHITELIST', '*')
-    cors.init_app(bp, origins=origins)
+    from audiosm.users.views import bp as ubp
+    from audiosm.jobs.views import bp as jbp
+    from audiosm.streams.views import bp as sbp
 
-    app.register_blueprint(bp)
+    origins = app.config.get('CORS_ORIGIN_WHITELIST', '*')
+    cors.init_app(ubp, origins=origins)
+    cors.init_app(sbp, origins=origins)
+    cors.init_app(jbp, origins=origins)
+
+    app.register_blueprint(ubp)
+    app.register_blueprint(sbp)
+    app.register_blueprint(jbp)

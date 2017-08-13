@@ -11,10 +11,9 @@ from flask_script import (Manager,
                           Server,
                           Command,
                           Option)
-from injector import app_factory
-from extensions import db
-from models import UserModel
-from settings import devConfig
+from audiosm import app_factory
+from audiosm.users.models import UserModel
+from audiosm.settings import devConfig, prodConfig
 from os import environ
 from distutils import util
 import flask
@@ -86,7 +85,7 @@ class GunicornServer(Command):
 
 
 if isdebug:
-    server = Server(host="0.0.0.0", port=5000, use_reloader=True)
+    server = Server(host="0.0.0.0", port=8080, use_reloader=True)
 else:
     server = GunicornServer()
 

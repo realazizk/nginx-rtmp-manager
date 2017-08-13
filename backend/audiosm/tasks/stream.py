@@ -1,6 +1,6 @@
-from extensions import celery
+from audiosm.extensions import celery
 from ffmpy import FFmpeg
-import settings
+from audiosm import settings
 
 ###
 # Stream tasks

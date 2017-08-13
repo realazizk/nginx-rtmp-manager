@@ -5,7 +5,7 @@ from flask_cors import CORS
 from celery import Celery
 from flask_migrate import Migrate
 from flask_redis import FlaskRedis
-from settings import Config
+from audiosm.settings import Config
 
 
 class CRUDMixin(Model):
@@ -41,6 +41,7 @@ celery = Celery(__name__, broker=Config.CELERY_BROKER_URL)
 migrate = Migrate(db=db)
 redis_store = FlaskRedis()
 
+
 def jwt_identity(payload):
     user_id = payload['identity']
     return UserModel.get_by_id(user_id)
@@ -51,6 +52,6 @@ def authenticate(email, password):
     if user and user.check_password(password):
         return user
 
-from models import UserModel # noqa
+from audiosm.users.models import UserModel # noqa
 
 jwt = JWT(authentication_handler=authenticate, identity_handler=jwt_identity)
