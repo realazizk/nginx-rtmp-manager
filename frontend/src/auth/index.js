@@ -5,8 +5,8 @@
 
 
 import router from '@/router'
+import {API_URL} from '@/shared.js'
 
-const API_URL = 'http://localhost:8080/'
 const LOGIN_URL = API_URL + 'api/login'
 const SIGNUP_URL = API_URL + 'users/'
 

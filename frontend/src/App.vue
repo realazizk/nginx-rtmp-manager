@@ -142,8 +142,8 @@
 import auth from '@/auth'
 import Home from '@/components/Home'
 import bus from '@/eventbus.js'
+import {API_URL} from '@/shared.js'
 
-const API_URL = 'http://localhost:8080/'
 const STREAM_ADD_URL = API_URL + 'api/stream'
 const JOB_ADD_URL = API_URL + 'api/job'
 

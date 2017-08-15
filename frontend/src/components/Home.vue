@@ -18,8 +18,8 @@
 
 <script>
 
- const API_URL = 'http://localhost:8080/'
-import bus from '@/eventbus.js';
+import bus from '@/eventbus.js'
+import {API_URL, SERVER_URL} from '@/shared.js'
 
 var component = {
   data() {
@@ -35,7 +35,7 @@ var component = {
        if (audio.paused || stream.name !== this.isplaying) {
 	 
 	 this.player.attachMedia(audio);
-	 this.player.loadSource('http://192.168.100.2/stream/' +stream.name+ '.m3u8');
+	 this.player.loadSource(SERVER_URL +stream.name+ '.m3u8');
 	 bus.$emit('setplaying', stream.name)
 	 this.toggleplaying(false)
 
@@ -68,11 +68,10 @@ var component = {
         response => {
           let data = response.body
           this.channels = data
-	  console.log(this.channels)
 
 	  this.channels.forEach(function (item, index, array){
 	    vm.$http.get(
-	      'http://192.168.100.2/stream/' +item.name+ '.m3u8'
+	      SERVER_URL +item.name+ '.m3u8'
 	    ).then(response => {
 	      item.live = true
 	      vm.$set(array[index], item)
