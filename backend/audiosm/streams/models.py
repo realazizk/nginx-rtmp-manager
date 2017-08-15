@@ -15,3 +15,6 @@ class StreamModel(db.Model, SurrogatePK):
 
     def __init__(self, name, password, **kwargs):
         super().__init__(name=name, password=password, **kwargs)
+
+    def __repr__(self):
+        return self.name
