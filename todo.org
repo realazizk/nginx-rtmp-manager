@@ -1,15 +1,13 @@
 
 
-* TODO [#A] Organize the backend code
+* DONE [#A] Organize the backend code
+  CLOSED: [2017-08-15 Tue 05:34]
 
-* TODO [#A] Add an RTMP login system
-
+* TODO [#A] Add a test system
 * TODO [#A] Add an admin system
-
-* TODO [#B] Add user stream managment
-
 * TODO [#B] Add multiple job scheduling
-
+* TODO [#B] Add user stream managment
+* TODO [#A] Add an RTMP login system
 * TODO [#B] Add inf loop feature
 
 * TODO [#B] Add cron job features (repeat every)
