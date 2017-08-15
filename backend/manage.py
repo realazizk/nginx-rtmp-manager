@@ -5,7 +5,6 @@ Copyright Mohamed Aziz knani <medazizknani@gmai.com> 2017
 """
 
 from flask_script import (Manager,
-                          prompt_bool,
                           prompt_pass,
                           prompt,
                           Server,
@@ -15,6 +14,7 @@ from audiosm import app_factory
 from audiosm.users.models import UserModel
 from audiosm.settings import devConfig, prodConfig
 from os import environ
+import os
 from distutils import util
 import flask
 from flask_migrate import MigrateCommand
@@ -30,7 +30,20 @@ def makesuperuser():
     username = prompt('Enter username')
     email = prompt('Enter email')
     password = prompt_pass('Enter password')
-    UserModel.create(username=username, password=password, email=email)
+    UserModel.create(username=username, password=password,
+                     email=email, active=True)
+
+
+PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
+TEST_PATH = os.path.join(PROJECT_ROOT, 'tests')
+
+
+@manager.command
+def test():
+    """Run the tests."""
+    import pytest
+    rv = pytest.main([TEST_PATH, '--verbose', '--disable-pytest-warnings'])
+    exit(rv)
 
 
 class GunicornServer(Command):
@@ -85,7 +98,7 @@ class GunicornServer(Command):
 
 
 if isdebug:
-    server = Server(host="0.0.0.0", port=8080, use_reloader=True)
+    server = Server(host="0.0.0.0", port=8090, use_reloader=True)
 else:
     server = GunicornServer()
 
