@@ -10,7 +10,7 @@ from flask import Flask
 
 from audiosm.exceptions import InvalidUsage
 from audiosm.extensions import (bcrypt, celery, cors, db, jwt, migrate,
-    redis_store)
+                                redis_store, admin_ob)
 from audiosm.settings import devConfig, Config
 
 
@@ -38,6 +38,8 @@ def app_factory(config: Config=devConfig) -> Flask:
         response.status_code = error.status_code
         return response
 
+    import audiosm.admin        # noqa
+    
     return app
 
 
@@ -47,6 +49,7 @@ def register_extensions(app: Flask):
     jwt.init_app(app)
     migrate.init_app(app)
     redis_store.init_app(app)
+    admin_ob.init_app(app)
 
 
 def register_blueprints(app: Flask):
