@@ -75,7 +75,7 @@ class UserModel(db.Model, SurrogatePK, UserMixin):
     password = Column(db.Binary(128), nullable=True)
     created_at = Column(db.DateTime, nullable=False,
                         default=func.now())
-    active = db.Column(db.Boolean())
+    active = db.Column(db.Boolean(), default=False)
     roles = db.relationship('RoleModel', secondary=roles_users,
                             backref=db.backref('users', lazy='dynamic'))
 
@@ -95,6 +95,15 @@ class UserModel(db.Model, SurrogatePK, UserMixin):
     @property
     def id_token(self):
         return _default_jwt_encode_handler(self).decode('utf-8')
+
+    def add_role(self, role):
+        self.roles.append(role)
+
+    def has_role(self, role):
+        if isinstance(role, string_types):
+            return role in (role.name for role in self.roles)
+        else:
+            return role in self.roles
 
 
 class RoleMixin(object):

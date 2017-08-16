@@ -9,3 +9,4 @@ class StreamSchema(Schema):
 
 
 StreamsSchema = StreamSchema(many=True)
+StreamSchema = StreamSchema(strict=True)

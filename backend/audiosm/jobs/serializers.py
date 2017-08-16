@@ -7,3 +7,5 @@ class JobSchema(Schema):
     filename = fields.Str()
     begin_date = fields.DateTime()
     id = fields.Str(load_only=True)
+
+JobSchema = JobSchema(strict=True)  # noqa

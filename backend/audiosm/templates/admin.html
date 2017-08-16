@@ -1,0 +1,20 @@
+{% extends 'admin/base.html' %}
+
+{% block access_control %}
+    {{ super() }}
+    <ul class="nav navbar-nav navbar-right">
+	<li>
+	    <a href="#">
+		<span class="glyphicon glyphicon-user"></span>
+		{{ current_user.username }}</a> 
+	</li>
+	<li>
+	    <p class="navbar-btn">
+		<a href="/logout" class="btn btn-default">
+		    <span class="glyphicon glyphicon-log-out"></span>
+		   Log out</a>
+	    </p>
+	</li>
+
+    </ul>
+{% endblock %}

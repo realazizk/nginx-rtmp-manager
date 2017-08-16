@@ -45,3 +45,13 @@ class prodConfig(Config):
     """
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL',
                                              'postgresql://localhost/example')
+
+
+class testConfig(Config):
+    """Test configuration."""
+
+    TESTING = True
+    DEBUG = True
+    SQLALCHEMY_DATABASE_URI = 'sqlite://'
+    # For faster tests; needs at least 4 to avoid "ValueError: Invalid rounds"
+    BCRYPT_LOG_ROUNDS = 4

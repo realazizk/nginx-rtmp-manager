@@ -4,11 +4,11 @@
 import pytest
 from webtest import TestApp
 
-from conduit.app import create_app
-from conduit.database import db as _db
-from conduit.settings import TestConfig
-from conduit.profile.models import UserProfile
-
+from audiosm import app_factory
+from audiosm.database import db as _db
+from audiosm.settings import testConfig
+from audiosm.users.models import UserModel, RoleModel
+from .exceptions import AdminRoleNotFound
 
 from .factories import UserFactory
 
@@ -16,7 +16,7 @@ from .factories import UserFactory
 @pytest.yield_fixture(scope='function')
 def app():
     """An application for the tests."""
-    _app = create_app(TestConfig)
+    _app = app_factory(testConfig)
 
     with _app.app_context():
         _db.create_all()
@@ -53,9 +53,29 @@ def db(app):
 def user(db):
     """A user for the tests."""
     class User():
-        def get(self):
+        def get(self) -> UserModel:
             muser = UserFactory(password='myprecious')
-            UserProfile(muser).save()
+            db.session.commit()
+            return muser
+    return User()
+
+
+@pytest.fixture
+def adminrole(db):
+    # Add admin role
+    return RoleModel.create(name='admin')
+
+
+@pytest.fixture
+def admin(db):
+    """A user for the tests."""
+    class User():
+        def get(self) -> UserModel:
+            muser = UserFactory(password='myprecious')
+            adminrole = RoleModel.query.filter_by(name='admin').first()
+            if not adminrole:
+                raise AdminRoleNotFound
+            muser.add_role(adminrole)
             db.session.commit()
             return muser
     return User()
