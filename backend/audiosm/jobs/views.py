@@ -47,7 +47,7 @@ def authorize():
 @jwt_required()
 @use_kwargs(JobSchema)
 @marshal_with(JobSchema)
-def newjob(stream, filename, begin_date):
+def newjob(stream, filename, begin_date, inf):
     stream = StreamModel.query.filter_by(name=stream['name']).first()
     if not stream:
         # BUG here debug the traceback
@@ -59,7 +59,7 @@ def newjob(stream, filename, begin_date):
 
     job = JobModel.create(streamid=stream.id,
                           adminid=current_identity.id, filename=fpth)
-    instancejs = JobSchema()
+    instancejs = JobSchema
     result = instancejs.dump(job)
     play_audio_task.apply_async(
         kwargs=result.data, countdown=10, serializers="json")

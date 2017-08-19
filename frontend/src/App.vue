@@ -11,16 +11,12 @@
           <router-link active-class="active"  tag="li" to="contact"> <router-link to="contact">Contact</router-link> </router-link>     </li>
 
 <li class="dropdown" v-if="user.authenticated">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Admin actions<span class="caret"></span></a>
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">User actions<span class="caret"></span></a>
   <ul class="dropdown-menu">
     <li class="dropdown-header">Stream</li>
     <li><a @click="opentheModal()" href="#">Add stream</a></li>
     <li><a href="#">Delete stream</a></li>
     <li role="separator" class="divider"></li>
-    <li class="dropdown-header">Users</li>
-    <li><a href="#">Add admin</a></li>
-    <li><a href="#">Delete admin</a></li>
-
     <li class="dropdown-header">Jobs</li>
     <li><router-link to="jobs">Manage jobs</router-link></li>
     <li><a @click="opentheJobModal()" href="#">Add a job</a></li>
@@ -107,6 +103,10 @@
       <label for="fileinput">The file (can convert video to audio only)</label>
       <input id="fileinput" type="file" class="file" v-on:change="uploadFile">
       
+      <div class="checkbox">
+	<label><input type="checkbox" v-model="job.infinite" >Infinite playback</label>
+      </div>
+     
       <div class="form-group">
 	<label for="dtinput1">Enter date</label>
 	<div class='input-group date' id='datetimepicker1'>
@@ -163,7 +163,8 @@ let component =  {
         sname: '',
 	activate: true,
 	fileduration: 0, // in seconds
-	filehash: ''
+	filehash: '',
+	infinite: false
       },
       playerm: {
 	playing: false,
@@ -174,6 +175,26 @@ let component =  {
       datefinish: '',
     }
   },
+
+  watch: {
+    'datefinish': function (val) {
+      if (this.job.infinite) {
+	this.datefinish = '∞'
+      }
+    },
+    
+    'job.infinite': function (val) {
+      if (val) {
+	this.datefinish = '∞'
+      } else {
+	// FIXME: no jquery shit
+	let date = $("#datetimepicker1").data("DateTimePicker").date().toDate()
+	this.datefinish = new Date(date.getTime() + 1000 * this.job.fileduration)
+      }
+    }
+    
+  },
+  
   methods: {
 
     setplaying (stream) {
@@ -188,6 +209,10 @@ let component =  {
        } else {
 	 this.playerm.pclass = 'songPaused'
        }
+      bus.$emit(
+	'toggleplaying', this.playerm.playing
+      )
+      
     },
     opentheModal() {
       this.$refs.addstream.open()
@@ -233,7 +258,8 @@ let component =  {
 	  name: this.job.sname
 	},
 	filename: this.job.filehash,
-	begin_date: $("#datetimepicker1").data("DateTimePicker").date().toDate()
+	begin_date: $("#datetimepicker1").data("DateTimePicker").date().toDate(),
+	inf: this.job.infinite
       }
 
       var modal = this.$refs.addJob
@@ -281,10 +307,10 @@ let component =  {
 
     var input = $("#fileinput");
     input.fileinput({
-      uploadUrl: "http://localhost:8080/api/upload",
+      uploadUrl: API_URL + "api/upload",
       maxFileCount: 1,
       showUpload: false,
-      showRemove: false,
+      // showRemove: false,
       ajaxSettings: {'headers': {'Authorization': 'Token ' + localStorage.getItem('id_token')}}
     }).on("filebatchselected", function(event, files) {
       // trigger upload method immediately after files are selected

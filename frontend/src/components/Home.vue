@@ -32,7 +32,7 @@ var component = {
    methods: {
      play (stream) {
        let audio = document.getElementById('audio');
-       if (audio.paused || stream.name !== this.isplaying) {
+       if (audio.paused || stream.name !== this.isplaying) {
 	 
 	 this.player.attachMedia(audio);
 	 this.player.loadSource(SERVER_URL +stream.name+ '.m3u8');
@@ -52,12 +52,11 @@ var component = {
      ,toggleplaying (truth) {
        let audio = document.getElementById('audio')
        let vm = this
-       setTimeout( () => {
-	 if (truth) {
-	   audio.play();
-	 } else {
-	   audio.pause();
-	 }}, 150)
+       if (truth) {
+	 audio.play();
+       } else {
+	 audio.pause();
+       }
      }
      
    },
@@ -87,6 +86,10 @@ var component = {
       if(Hls.isSupported()) {
         this.player = new Hls();
       }
+     
+     bus.$on('toggleplaying',(truth) => {
+       vm.toggleplaying(truth)
+     })
    },
 
 }

@@ -11,10 +11,11 @@ from audiosm.jobs.models import JobModel
 
 
 @celery.task(ignore_result=True, base=DatabaseTask, bind=True)
-def play_audio_task(self, id, filename, stream, *a, **kw):
+def play_audio_task(self, id, filename, stream, inf, *a, **kw):
+    loop = '-1' if inf else '0'
     f = FFmpeg(
         inputs={
-            filename: ['-re']
+            filename: ['-re', '-stream_loop', loop]
         },
         outputs={
             'rtmp://{host}:1935/stream/{stream}'.format(

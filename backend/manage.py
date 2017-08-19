@@ -4,23 +4,22 @@ Copyright Mohamed Aziz knani <medazizknani@gmai.com> 2017
 
 """
 
-from flask_script import (Manager,
-                          prompt_pass,
-                          prompt,
-                          Server,
-                          Command,
-                          Option)
-from audiosm import app_factory
-from audiosm.users.models import UserModel
-from audiosm.settings import devConfig, prodConfig
-from os import environ
+import functools
 import os
 from distutils import util
+from os import environ
+
 import flask
-from flask_migrate import MigrateCommand
-import functools
 from flask import current_app
-from werkzeug.exceptions import NotFound, MethodNotAllowed
+from flask_migrate import MigrateCommand
+from flask_script import Command, Manager, Option, Server, prompt, prompt_pass
+from sqlalchemy.exc import IntegrityError
+from werkzeug.exceptions import MethodNotAllowed, NotFound
+
+from audiosm import app_factory
+from audiosm.extensions import db
+from audiosm.settings import devConfig, prodConfig
+from audiosm.users.models import RoleModel, UserModel
 
 
 isdebug = util.strtobool(environ.get('DEV', None))
@@ -30,11 +29,19 @@ manager = Manager(app)
 
 @manager.command
 def makesuperuser():
+    # make admin role if it doesn't exist
+    try:
+        role = RoleModel.create(name='admin')
+    except IntegrityError:
+        db.session.rollback()
+        role = RoleModel.query.filter_by(name='admin').first()
     username = prompt('Enter username')
     email = prompt('Enter email')
     password = prompt_pass('Enter password')
-    UserModel.create(username=username, password=password,
-                     email=email, active=True)
+    user = UserModel.create(username=username, password=password,
+                            email=email, active=True)
+    user.add_role(role)
+    user.save()
 
 
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))

@@ -65,7 +65,8 @@ roles_users = db.Table('rolesusers',
                        db.Column('user_id', db.Integer(),
                                  db.ForeignKey('users.id')),
                        db.Column('role_id', db.Integer(),
-                                 db.ForeignKey('role.id')))
+                                 db.ForeignKey('role.id')),
+                       db.PrimaryKeyConstraint('user_id', 'role_id'))
 
 
 class UserModel(db.Model, SurrogatePK, UserMixin):
@@ -78,6 +79,7 @@ class UserModel(db.Model, SurrogatePK, UserMixin):
     active = db.Column(db.Boolean(), default=False)
     roles = db.relationship('RoleModel', secondary=roles_users,
                             backref=db.backref('users', lazy='dynamic'))
+
 
     def __init__(self, username, email, password=None, *args, **kwargs):
         super().__init__(username=username, email=email, *args, **kwargs)
@@ -104,6 +106,9 @@ class UserModel(db.Model, SurrogatePK, UserMixin):
             return role in (role.name for role in self.roles)
         else:
             return role in self.roles
+
+    def __repr__(self):
+        return self.username
 
 
 class RoleMixin(object):

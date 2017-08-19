@@ -75,6 +75,7 @@ class MyAdminIndexView(AdminIndexView):
     def _handle_view(self, name, **kwargs):
         if not session.get('logged_in'):
             return self.render('login.html')
+        self._template_args['username'] = session.get('username')
 
 
 admin_ob = Admin(name='streammanager', template_mode='bootstrap3',

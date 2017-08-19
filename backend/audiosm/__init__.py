@@ -37,9 +37,9 @@ def app_factory(config: Config=devConfig) -> Flask:
         response = error.to_json()
         response.status_code = error.status_code
         return response
-
+    # FIXME: ugly hack
     import audiosm.admin        # noqa
-    
+
     return app
 
 

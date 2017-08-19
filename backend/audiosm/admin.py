@@ -4,6 +4,8 @@ from audiosm.database import db
 from audiosm.users.models import UserModel, RoleModel
 from flask_admin import BaseView, expose
 from flask import session, redirect, url_for, request, flash
+from audiosm.jobs.models import JobModel
+from audiosm.streams.models import StreamModel
 
 
 class LoginView(BaseView):
@@ -16,6 +18,7 @@ class LoginView(BaseView):
             if user is not None and user.check_password(password):
                 if user.has_role('admin'):
                     session['logged_in'] = True
+                    session['username'] = user.username
                 else:
                     flash('You are not admin')
             else:
@@ -28,6 +31,25 @@ class LoginView(BaseView):
         return False
 
 
-admin_ob.add_view(ModelView(UserModel, db.session))
+class LogoutView(BaseView):
+    @expose('/', methods=('GET',))
+    def index(self):
+        session.clear()
+        return redirect(url_for('admin.index'))
+
+    def is_visible(self):
+        return False
+
+
+class UserAdminView(ModelView):
+    column_exclude_list = ['password', ]
+    form_excluded_columns = ['password', ]
+    inline_models = [JobModel]
+
+
+admin_ob.add_view(UserAdminView(UserModel, db.session))
 admin_ob.add_view(ModelView(RoleModel, db.session))
 admin_ob.add_view(LoginView(name='Login', endpoint='login'))
+admin_ob.add_view(LogoutView(name='Logout', endpoint='logout'))
+admin_ob.add_view(ModelView(JobModel, db.session))
+admin_ob.add_view(ModelView(StreamModel, db.session))
