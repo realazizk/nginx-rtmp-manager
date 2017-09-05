@@ -1,5 +1,9 @@
 import io
 from audiosm.compat import string_types
+import os
+import sys
+from contextlib import contextmanager
+
 
 ALLOWED_EXTENSIONS = set(['mp3', 'mp4', 'aac', 'opus', 'mkv', 'webm'])
 
@@ -32,3 +36,16 @@ class MyBuffer(io.BytesIO):
         finally:
             if close_dst:
                 dst.close()
+
+
+@contextmanager
+def silence_stdout():
+    """
+    Suppresses output
+    """
+    new_target = open(os.devnull, "w")
+    old_target, sys.stdout = sys.stdout, new_target
+    try:
+        yield new_target
+    finally:
+        sys.stdout = old_target

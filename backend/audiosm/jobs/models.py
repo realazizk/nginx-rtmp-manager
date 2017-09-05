@@ -11,10 +11,14 @@ class JobModel(db.Model, SurrogatePK):
     filename = Column(db.String(100))
     stream = relationship(StreamModel, backref=db.backref('jobs'))
     streamid = reference_col('streams')
-    admin = relationship(UserModel, backref=db.backref('jobs'))
+    admin = relationship(UserModel, backref=db.backref('jobs'),
+                         lazy='subquery')
     adminid = reference_col('users')
     done = Column(db.Boolean, default=False)
     streamstart = Column(db.DateTime, nullable=False, default=func.now())
+    inf = Column(db.Boolean, nullable=False, default=False)
+    taskid = Column(db.String(100))
+    streamfinish = Column(db.DateTime, nullable=True)
 
     def __init__(self, streamid, adminid, **kwargs):
         super().__init__(streamid=streamid, adminid=adminid, **kwargs)

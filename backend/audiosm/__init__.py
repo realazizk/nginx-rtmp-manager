@@ -6,7 +6,10 @@ Copyright Mohamed Aziz knani <medazizknani@gmai.com> 2017
 
 import logging
 
-from flask import Flask
+from flask import Flask, jsonify, _request_ctx_stack
+from flask_jwt import _jwt
+import jwt as bjwt
+
 
 from audiosm.exceptions import InvalidUsage
 from audiosm.extensions import (bcrypt, celery, cors, db, jwt, migrate,
@@ -37,6 +40,32 @@ def app_factory(config: Config=devConfig) -> Flask:
         response = error.to_json()
         response.status_code = error.status_code
         return response
+
+    @app.errorhandler(422)
+    def handle_unprocessable_entity(err):
+        # webargs attaches additional metadata to the `data` attribute
+        exc = getattr(err, 'exc')
+        if config.DEBUG:
+            app.logger.warning(exc)
+        if exc:
+            # Get validations from the ValidationError object
+            messages = exc.messages
+        else:
+            messages = ['Invalid request']
+        return jsonify({
+            'messages': messages,
+        }), 422
+
+    @app.before_request
+    def push_to_ctx():
+        token = _jwt.request_callback()
+        try:
+            payload = _jwt.jwt_decode_callback(token)
+        except bjwt.exceptions.DecodeError:
+            pass
+        else:
+            _request_ctx_stack.top.current_identity = _jwt.identity_callback(payload)
+
     # FIXME: ugly hack
     import audiosm.admin        # noqa
 

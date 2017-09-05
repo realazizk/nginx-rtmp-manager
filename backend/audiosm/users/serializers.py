@@ -6,4 +6,4 @@ class UserSchema(Schema):
     password = fields.Str(required=True, load_only=True)
     id_token = fields.Str(dump_only=True)
 
-UserSchema = UserSchema(strict=True)  # noqa
+UserSchema = UserSchema()  # noqa

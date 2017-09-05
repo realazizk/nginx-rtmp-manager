@@ -15,7 +15,7 @@
   <ul class="dropdown-menu">
     <li class="dropdown-header">Stream</li>
     <li><a @click="opentheModal()" href="#">Add stream</a></li>
-    <li><a href="#">Delete stream</a></li>
+    <li><router-link to="streams">Manage streams</router-link></li>
     <li role="separator" class="divider"></li>
     <li class="dropdown-header">Jobs</li>
     <li><router-link to="jobs">Manage jobs</router-link></li>
@@ -235,12 +235,12 @@ let component =  {
     },
 
     submitstream () {
-      var data = {
+      let data = {
         name: this.stream.name,
         password: this.stream.password,
         stype: this.stream.stype
       }
-      var modal = this.$refs.addstream
+      let modal = this.$refs.addstream
       this.$http.post(STREAM_ADD_URL, data, {headers: auth.getAuthHeader()})
         .then(response => {
           let data = response.data
@@ -252,19 +252,21 @@ let component =  {
     },
 
     submitjob () {
-      // console.log(this.inputdatejob)
-      var data = {
+
+      let data = {
 	stream: {
 	  name: this.job.sname
 	},
 	filename: this.job.filehash,
-	begin_date: $("#datetimepicker1").data("DateTimePicker").date().toDate(),
+	streamstart: $("#datetimepicker1").data("DateTimePicker").date().toDate(),
+	streamfinish: new Date(this.datefinish),
 	inf: this.job.infinite
       }
-
-      var modal = this.$refs.addJob
+      
+      let modal = this.$refs.addJob
       this.$http.post(JOB_ADD_URL, data, {headers: auth.getAuthHeader()})
         .then(response => {
+	  console.log(data)
           let data = response.data
           modal.close()
         },response => {
@@ -305,7 +307,7 @@ let component =  {
     })
     
 
-    var input = $("#fileinput");
+    let input = $("#fileinput");
     input.fileinput({
       uploadUrl: API_URL + "api/upload",
       maxFileCount: 1,
@@ -317,9 +319,9 @@ let component =  {
       input.fileinput("upload");
     })
 
-    var vue = this
+    let vue = this
     $('#fileinput').on('fileuploaded', function(event, data, previewId, index) {
-      var form = data.form, files = data.files, extra = data.extra, 
+      let form = data.form, files = data.files, extra = data.extra, 
 	  response = data.response, reader = data.reader;
       let duration = response.duration
       let filehash = response.hashid

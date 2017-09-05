@@ -4,6 +4,7 @@ import Login from '@/components/Login'
 import Home from '@/components/Home'
 import Player from '@/components/Player'
 import Jobs from '@/components/Jobs'
+import Streams from '@/components/Streams'
 
 
 Vue.use(Router)
@@ -29,6 +30,13 @@ export default new Router({
       path: '/player/:name',
       name: 'Player',
       component: Player
-    }
+    },
+
+    {
+      path: '/streams',
+      name: 'Streams',
+      component: Streams
+    },
+
   ]
 })

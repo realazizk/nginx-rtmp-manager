@@ -27,6 +27,7 @@ class Config:
     CELERY_IMPORTS = ['audiosm.tasks.stream']
     UPLOAD_FOLDER = '/tmp'
     STREAM_HOST = 'localhost'
+    DEBUG = False
 
 
 class devConfig(Config):
@@ -37,6 +38,7 @@ class devConfig(Config):
     DB_PATH = os.path.join(Config.PROJECT_ROOT, DB_NAME)
     SQLALCHEMY_DATABASE_URI = 'sqlite:///{0}'.format(DB_PATH)
     JWT_EXPIRATION_DELTA = timedelta(10**6)  # for easier testing
+    DEBUG = True
 
 
 class prodConfig(Config):
@@ -51,7 +53,6 @@ class testConfig(Config):
     """Test configuration."""
 
     TESTING = True
-    DEBUG = True
     SQLALCHEMY_DATABASE_URI = 'sqlite://'
     # For faster tests; needs at least 4 to avoid "ValueError: Invalid rounds"
     BCRYPT_LOG_ROUNDS = 4

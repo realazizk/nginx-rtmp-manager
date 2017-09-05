@@ -4,12 +4,11 @@
   CLOSED: [2017-08-15 Tue 23:03]
 
 * DONE [#A] Add a test system
-  CLOSED: [2017-08-15 Tue 23:03]
 * DONE [#A] Add an admin system
   CLOSED: [2017-08-15 Tue 23:03]
-* TODO [#C] Add multiple job scheduling
-* TODO [#B] Add user stream managment
+* DONE [#B] Add inf loop feature
+  CLOSED: [2017-09-02 Sat 06:50]
+* DONE [#B] Add user stream managment
+  CLOSED: [2017-09-02 Sat 12:19]
 * TODO [#A] Add an RTMP login system
-* TODO [#B] Add inf loop feature
 
-* TODO [#B] Add cron job features (repeat every)
