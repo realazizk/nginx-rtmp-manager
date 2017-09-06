@@ -127,11 +127,12 @@ class GunicornServer(Command):
 
     description = 'Run the app within Gunicorn'
 
-    def __init__(self, host='0.0.0.0', port=5000, workers=4):
+    def __init__(self, host='0.0.0.0', port=5000, workers=4, timeout=300):
         self.port = port
         self.host = host
         self.workers = workers
-
+        self.timeout = timeout
+        
     def get_options(self):
         return (
             Option('-H', '--host',
@@ -147,16 +148,25 @@ class GunicornServer(Command):
                    dest='workers',
                    type=int,
                    default=self.workers),
+            Option('-t', '--timeout',
+                   dest='timeout',
+                   type=int,
+                   default=self.timeout)
+    
         )
 
-    def __call__(self, app, host, port, workers):
+    def __call__(self, app, host, port, workers, timeout):
 
         from gunicorn import version_info
 
         if version_info < (0, 9, 0):
             from gunicorn.arbiter import Arbiter
             from gunicorn.config import Config
-            arbiter = Arbiter(Config({'bind': "%s:%d" % (host, int(port)), 'workers': workers}), app)
+            arbiter = Arbiter(Config({
+                'bind': "%s:%d" % (host, int(port)),
+                'workers': workers,
+                'timeout': timeout
+            }), app)
             arbiter.run()
         else:
             from gunicorn.app.base import Application
@@ -165,7 +175,8 @@ class GunicornServer(Command):
                 def init(self, parser, opts, args):
                     return {
                         'bind': '{0}:{1}'.format(host, port),
-                        'workers': workers
+                        'workers': workers,
+                        'timeout': timeout
                     }
 
                 def load(self):
