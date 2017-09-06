@@ -1,7 +1,7 @@
 
 
-const API_URL = "http://localhost:8090/"
-const SERVER_URL = "http://localhost/stream/"
+const API_URL = "http://45.77.99.83:5000/"
+const SERVER_URL = "http://45.77.99.83/stream/"
 
 export {
   API_URL,
