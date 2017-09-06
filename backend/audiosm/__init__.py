@@ -55,7 +55,7 @@ def app_factory(config: Config=devConfig) -> Flask:
         return jsonify({
             'messages': messages,
         }), 422
-    
+
     # visit http://aziz.tn/technical-blog/flask-jwt-optional.html
     # to know why I do this
     @app.before_request

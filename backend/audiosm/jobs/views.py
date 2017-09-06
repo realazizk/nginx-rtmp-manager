@@ -77,6 +77,7 @@ def newjob(stream, filename, streamstart, inf, **kwargs):
     fpth = redis_store.get(filename)
     if not fpth:
         raise InvalidUsage.file_not_found()
+    fpth = fpth.decode('utf-8')
 
     job = JobModel.create(streamid=stream.id,
                           adminid=current_identity.id, filename=fpth, inf=inf,
