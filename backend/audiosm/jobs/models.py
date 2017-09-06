@@ -8,7 +8,7 @@ from sqlalchemy.orm import relationship
 
 class JobModel(db.Model, SurrogatePK):
     __tablename__ = 'jobs'
-    filename = Column(db.String(100))
+    filename = Column(db.String(300))
     stream = relationship(StreamModel, backref=db.backref('jobs'))
     streamid = reference_col('streams')
     admin = relationship(UserModel, backref=db.backref('jobs'),

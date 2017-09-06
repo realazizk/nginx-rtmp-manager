@@ -47,6 +47,9 @@ class prodConfig(Config):
     """
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL',
                                              'postgresql://localhost/example')
+    # FIXME: bad solution
+    # should only be used for remember me
+    JWT_EXPIRATION_DELTA = timedelta(10**6)
 
 
 class testConfig(Config):
