@@ -201,8 +201,8 @@ def drop_into_pdb(app, exception):
     traceback.print_exc()
     pdb.post_mortem(sys.exc_info()[2])
 
-
-flask.got_request_exception.connect(drop_into_pdb)
+if isdebug:
+    flask.got_request_exception.connect(drop_into_pdb)
 
 if __name__ == "__main__":
     manager.run()
