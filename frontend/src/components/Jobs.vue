@@ -4,10 +4,10 @@
         <table class="table table-bordered">
             <thead>
                 <tr>
-                    <th>Stream channel</th>
-                    <th>Start time UTC</th>
-                    <th>End time UTC</th>
-                    <th>File name</th>
+                    <th>{{$t('jobsp.streamchannel')}}</th>
+                    <th>{{$t('jobsp.starttime')}}</th>
+                    <th>{{$t('jobsp.endtime')}}</th>
+                    <th>{{$t('jobsp.filename')}}</th>
 		    <th></th>
                 </tr>
             </thead>

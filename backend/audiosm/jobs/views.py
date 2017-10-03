@@ -33,7 +33,10 @@ def fileupload():
         pth = os.path.join(settings.Config.UPLOAD_FOLDER, hashid)
         f.save(pth)
         redis_store.set(hashid, pth)
-        container = av.open(pth)
+        try:
+            container = av.open(pth)
+        except av.AVError:
+            return jsonify(dict(uploaded='ERROR'))
         return jsonify(dict(uploaded='OK',
                             duration=container.duration / av.time_base,
                             hashid=hashid))
@@ -68,29 +71,34 @@ def getjobs():
 @jwt_required()
 @use_kwargs(JobSchema)
 @marshal_with(JobSchema)
-def newjob(stream, filename, streamstart, inf, **kwargs):
+def newjob(stream, files, streamstart, inf, **kwargs):
     stream = StreamModel.query.filter_by(name=stream['name']).first()
     if not stream:
-        # BUG here debug the traceback
         raise InvalidUsage.stream_not_found()
 
-    fpth = redis_store.get(filename)
-    if not fpth:
-        raise InvalidUsage.file_not_found()
-    fpth = fpth.decode('utf-8')
-
     job = JobModel.create(streamid=stream.id,
-                          adminid=current_identity.id, filename=fpth, inf=inf,
+                          adminid=current_identity.id, inf=inf,
                           streamstart=streamstart, **kwargs)
 
+    for file in files:
+        try:
+            fpth = redis_store.get(file['filehash'])
+        except KeyError:
+            continue
+        if not fpth:
+            raise InvalidUsage.file_not_found()
+        fpth = fpth.decode('utf-8')
+        job.add_file(fpth)
     instancejs = JobSchema
     result = instancejs.dump(job)
     current_app.logger.info(result.data)
+    files = {'files': [f.filename for f in job.files]}
+    data = {**files, **result.data}
     if job.streamstart > dt.now():
         task = play_audio_task.apply_async(
-            kwargs=result.data, eta=job.streamstart, serializers="json")
+            kwargs=data, eta=job.streamstart, serializers="json")
     else:
-        task = play_audio_task.apply_async(kwargs=result.data,
+        task = play_audio_task.apply_async(kwargs=data,
                                            serializers="json")
     job.taskid = task.id
     return job.save()

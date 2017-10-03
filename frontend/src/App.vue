@@ -1,47 +1,81 @@
 <template>
-  <div id="app">
+<div id="app">
     <nav class="navbar navbar-inverse" id="nav">
-      <div class="container-fluid">
+    <div class="container-fluid">
         <div class="navbar-header">
-          <a class="navbar-brand" href="#">Stream manager</a>
+        <a class="navbar-brand" href="#">{{$t("name")}}</a>
         </div>
         <ul class="nav navbar-nav">
-          <router-link active-class="active" tag="li" to="home"><router-link to="home">Home</router-link></router-link>
+        <router-link active-class="active" tag="li" to="home"><router-link to="home">{{$t("home")}}</router-link></router-link>
 
-          <router-link active-class="active"  tag="li" to="contact"> <router-link to="contact">Contact</router-link> </router-link>     </li>
+        <router-link active-class="active"  tag="li" to="contact"> <router-link to="contact">{{$t("contact")}}</router-link> </router-link>     </li>
 
-<li class="dropdown" v-if="user.authenticated">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">User actions<span class="caret"></span></a>
-  <ul class="dropdown-menu">
-    <li class="dropdown-header">Stream</li>
-    <li><a @click="opentheModal()" href="#">Add stream</a></li>
-    <li><router-link to="streams">Manage streams</router-link></li>
-    <li role="separator" class="divider"></li>
-    <li class="dropdown-header">Jobs</li>
-    <li><router-link to="jobs">Manage jobs</router-link></li>
-    <li><a @click="opentheJobModal()" href="#">Add a job</a></li>
-  </ul>
-</li>
+	<li class="dropdown" v-if="user.authenticated">
+	    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{$t('menu.actions')}}<span class="caret"></span></a>
+	    <ul class="dropdown-menu">
+		<li class="dropdown-header">{{$t('menu.stream')}}</li>
+		<li><a @click="opentheModal()" href="#">{{$t('menu.addstream')}}</a></li>
+		<li><router-link to="streams">{{$t('menu.managestreams')}}</router-link></li>
+		<li role="separator" class="divider"></li>
+		<li class="dropdown-header">{{$t('menu.jobs')}}</li>
+		<li><router-link to="jobs">{{$t('menu.managejobs')}}</router-link></li>
+		<li><a @click="opentheJobModal()" href="#">{{$t('menu.addjob')}}</a></li>
+		</ul>
 
-</ul>
+		
+		
+	</li>
+
+	<li class="dropdown">
+	    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{$t('lang.l')}}<span class="caret"></span></a>
+	    
+	    <ul class="dropdown-menu">  
+		<li v-for="lang in $t('lang.ls')">
+		    <a @click="changeLang(lang['code'])"  href="#">{{lang['name']}}</a>
+		    </li>
+	    </ul>
+	</li>
+
+	</ul>
+
+	<template v-if="locale == 'ar'">
+	    <ul class="nav navbar-nav navbar-left">
+		<template v-if="!user.authenticated">
+		    <router-link active-class="active" tag="li" to="login">
+			<router-link to="login">
+			    <span class="glyphicon glyphicon-log-in"></span> {{$t("login")}}
+			    </router-link>
+		    </router-link>
+      </template>
+		<template v-else>
+		  <li>
+		    <router-link to="login" v-on:click.native="logout()">
+		      <span class="glyphicon glyphicon-log-in"></span> {{$t('bar.logout')}}
+		    </router-link>
+		  </li>
+		</template>
+	    </ul>
+	</template>
+	<template v-else>
+	  <ul class="nav navbar-nav navbar-right">
+	    <template v-if="!user.authenticated">
+	      <router-link active-class="active" tag="li" to="login">
+		<router-link to="login">
+		  <span class="glyphicon glyphicon-log-in"></span> {{$t("login")}}
+		</router-link>
+	      </router-link>
+	    </template>
+	    <template v-else>
+	      <li>
+		<router-link to="login" v-on:click.native="logout()">
+		  <span class="glyphicon glyphicon-log-in"></span> {{$t('bar.logout')}}
+		</router-link>
+	      </li>
+	    </template>
+	  </ul>
+	</template>
 
 
-<ul class="nav navbar-nav navbar-right">
-  <template v-if="!user.authenticated">
-    <router-link active-class="active" tag="li" to="login">
-      <router-link to="login">
-        <span class="glyphicon glyphicon-log-in"></span> Login
-      </router-link>
-    </router-link>
-  </template>
-  <template v-else>
-    <li>
-      <router-link to="login" v-on:click.native="logout()">
-        <span class="glyphicon glyphicon-log-in"></span> Logout
-      </router-link>
-    </li>
-  </template>
-</ul>
 </div>
 </nav>
 
@@ -68,26 +102,26 @@
 
 <bootstrap-modal ref="addstream" :needHeader="true" :needFooter="false" size="large">
   <div slot="title">
-    Add stream
+    {{$t('addstreammodal.title')}}
   </div>
   <div slot="body">
     <form action="">
-      <label for="name">The stream url</label>
+      <label for="name">{{$t('addstreammodal.url')}}</label>
       <div class="input-group">
         <span class="input-group-addon" id="basic-addon3">http://{{hostname}}</span>
         <input type="text"   v-model="stream.name" class="form-control" id="name" aria-describedby="basic-addon3">
       </div>
 
-      <label for="password">Password</label>
+      <label for="password">{{$t('addstreammodal.password')}}</label>
       <input type="password"  v-model="stream.password" class="form-control" id="password">
 
-      <label for="sel1">Select stream type:</label>
+      <label for="sel1">{{$t('addstreammodal.stype')}}</label>
       <select v-model="stream.stype"  class="form-control" id="stype">
         <option selected>video</option>
         <option>audio</option>
       </select>
 
-      <button type="submit" class="btn btn-default "  @click="submitstream()">Submit</button>
+      <button type="submit" class="btn btn-default "  @click="submitstream()">{{$t('addstreammodal.submit')}}</button>
 
     </form>
   </div>
@@ -96,22 +130,32 @@
 
 <bootstrap-modal ref="addJob" :needHeader="true" :needFooter="false" size="large">
   <div slot="title">
-    Add a job
+    {{$t('addjobmodal.title')}}
   </div>
   <div slot="body">
     <form action="">
-      <label for="fileinput">The file (can convert video to audio only)</label>
       <input id="fileinput" type="file" class="file" v-on:change="uploadFile">
       
       <div class="checkbox">
-	<label><input type="checkbox" v-model="job.infinite" >Infinite playback</label>
+	<label><input type="checkbox" v-model="job.infinite" >{{$t('addjobmodal.inf')}}</label>
       </div>
-     
+
+      <div class="checkbox">
+	<label><input type="checkbox" v-model="job.shuffle" >{{$t('addjobmodal.shuffle')}}</label>
+      </div>
+
+      
+
       <div class="form-group">
-	<label for="dtinput1">Enter date</label>
+
+	<div class="checkbox">
+	  <label><input type="checkbox" v-model="job.playnow" >{{$t('addjobmodal.playnow')}}</label>
+	</div>
+
+	<label for="dtinput1">{{$t('addjobmodal.enterdate')}}</label>
 	<div class='input-group date' id='datetimepicker1'>
 	  
-          <input v-bind:disabled="job.activate"  id="dtinput1" type='text' class="form-control" />
+          <input v-bind:disabled="job.activate || job.playnow"  id="dtinput1" type='text' class="form-control" />
           <span class="input-group-addon">
             <span class="glyphicon glyphicon-calendar"></span>
           </span>
@@ -119,14 +163,14 @@
 	</div>
 	<input disabled="true" v-model="datefinish" id="dtinput2" type='text' class="form-control" />
       </div>
-      <label for="selst">Select the channel to stream to</label>
+      <label for="selst">{{$t('addjobmodal.channel')}}</label>
       <select v-model="job.sname" v-bind:disabled="job.activate"  class="form-control" id="selst">
         <option v-for="stream in job.streams">
           {{stream.name}}
         </option>
       </select>
 
-      <button type="submit" class="btn btn-default " v-bind:disabled="job.activate" @click="submitjob()">Submit</button>
+      <button type="submit" class="btn btn-default " v-bind:disabled="job.activate" @click="submitjob()">{{$t('addjobmodal.submit')}}</button>
 
     </form>
   </div>
@@ -139,10 +183,12 @@
 </template>
 
 <script>
-import auth from '@/auth'
+  import auth from '@/auth'
 import Home from '@/components/Home'
 import bus from '@/eventbus.js'
 import {API_URL} from '@/shared.js'
+import moment from 'moment'
+
 
 const STREAM_ADD_URL = API_URL + 'api/stream'
 const JOB_ADD_URL = API_URL + 'api/job'
@@ -150,6 +196,11 @@ const JOB_ADD_URL = API_URL + 'api/job'
 
 let component =  {
   name: 'app',
+
+  ////
+  // Data
+  ////
+
   data() {
     return {
       user: auth.user,
@@ -162,9 +213,11 @@ let component =  {
         streams: [],
         sname: '',
 	activate: true,
-	fileduration: 0, // in seconds
-	filehash: '',
-	infinite: false
+	files: [],
+	infinite: false,
+	filesduration: 0,
+	shuffle: false,
+	playnow: false
       },
       playerm: {
 	playing: false,
@@ -173,9 +226,18 @@ let component =  {
       },
       inputdatejob: '',
       datefinish: '',
+      locale: this.$i18n.locale
     }
   },
 
+  ////
+  // End data
+  ////
+
+
+  ////
+  // Watchers
+  ////
   watch: {
     'datefinish': function (val) {
       if (this.job.infinite) {
@@ -189,14 +251,52 @@ let component =  {
       } else {
 	// FIXME: no jquery shit
 	let date = $("#datetimepicker1").data("DateTimePicker").date().toDate()
-	this.datefinish = new Date(date.getTime() + 1000 * this.job.fileduration)
+	this.datefinish = new Date(date.getTime() + 1000 * this.job.filesduration)
+      }
+    },
+
+    'job.filesduration': function (val) {
+      var l = $("#datetimepicker1").data("DateTimePicker").date()
+      if (l !== null) {
+	let date = l.toDate()
+	this.datefinish = new Date(date.getTime() + 1000 * val) }
+    },
+
+    'job.playnow': function (val) {
+      if (val) {
+	let nw = new Date()
+	this.datefinish = new Date(nw.getTime() + 1000 * this.job.filesduration)
       }
     }
+
     
   },
+
+  ////
+  // End watchers
+  ////
+
   
+  ////
+  // Methods
+  ////
   methods: {
 
+    getUTCDate() {
+      return moment($('#datetimepicker1').data("DateTimePicker").date()).utc().format('YYYY-MM-DDTHH:mm:ssZZ')
+    },
+    
+    changeLang(locale) {
+      if (['en', 'ar'].includes(locale)) {
+	this.$i18n.locale = locale
+	localStorage.setItem('lang', locale)
+	setTimeout(function(){
+	  window.location.reload();
+	},100); 
+      }
+      
+    },
+    
     setplaying (stream) {
       this.playerm.title = stream
       this.playerm.pclass = 'songPaused'
@@ -204,11 +304,11 @@ let component =  {
     
     toggleplaying (event) {
       this.playerm.playing = !this.playerm.playing
-       if (this.playerm.playing) {
-	   this.playerm.pclass = 'songPlaying'
-       } else {
-	 this.playerm.pclass = 'songPaused'
-       }
+      if (this.playerm.playing) {
+	this.playerm.pclass = 'songPlaying'
+      } else {
+	this.playerm.pclass = 'songPaused'
+      }
       bus.$emit(
 	'toggleplaying', this.playerm.playing
       )
@@ -253,13 +353,26 @@ let component =  {
 
     submitjob () {
 
+      function shuffle(a) {
+	// Fisher–Yates shuffle algorithm
+	for (let i = a.length; i; i--) {
+          let j = Math.floor(Math.random() * i);
+          [a[i - 1], a[j]] = [a[j], a[i - 1]];
+	}
+      }
+
+      if (this.job.shuffle) {
+	shuffle(this.job.files)
+      }
+
+      
       let data = {
 	stream: {
 	  name: this.job.sname
 	},
-	filename: this.job.filehash,
-	streamstart: $("#datetimepicker1").data("DateTimePicker").date().toDate(),
-	streamfinish: new Date(this.datefinish),
+	files: this.job.files,
+	streamstart: this.job.playnow ? moment().utc().format('YYYY-MM-DDTHH:mm:ssZZ') : this.getUTCDate(),
+	streamfinish: moment(this.datefinish).utc().format('YYYY-MM-DDTHH:mm:ssZZ'),
 	inf: this.job.infinite
       }
       
@@ -277,14 +390,36 @@ let component =  {
     }
 
   },
+  ////
+  // End methods
+  ////
+
+  ////
+  // Computed data
+  ////
   computed: {
     hostname () {
       return location.hostname + ':1935/stream/';
     }
 
   },
+  ////
+  // End Computed data
+  ////
+  
 
+  ////
+  // Created hook
+  ////
   created() {
+
+    let locale = localStorage.getItem('lang')
+    if (locale) {
+      // Vue.$i18n.locale is reactive so I can do this
+      if (locale && ['en', 'ar'].includes(locale))
+	this.$i18n.locale = locale	
+    }
+    
     this.$http.get(API_URL + 'api/streams').then(
       response => {
         let data = response.body
@@ -296,58 +431,87 @@ let component =  {
     })
 
   },
+  ////
+  // End Created hook
+  ////
 
+  
+  ////
+  // Mounted hook
+  ////
   mounted () {
-    
     $('#datetimepicker1').datetimepicker({
       minDate:new Date()
     }).on("dp.change", (dt, oldDate) => {
       let date = dt.date.toDate()
-      this.datefinish = new Date(date.getTime() + 1000 * this.job.fileduration)
+      this.datefinish = new Date(date.getTime() + 1000 * this.job.filesduration)
     })
-    
-
+    console.log(this.$i18n.locale)
+    if (this.$i18n.locale === 'ar') {
+      require('bootstrap-rtl/dist/css/bootstrap-rtl.css')
+    }
     let input = $("#fileinput");
+    
     input.fileinput({
       uploadUrl: API_URL + "api/upload",
-      maxFileCount: 1,
+      multiple: true,
       showUpload: false,
-      // showRemove: false,
+      showRemove: false,
       ajaxSettings: {'headers': {'Authorization': 'Token ' + localStorage.getItem('id_token')}}
-    }).on("filebatchselected", function(event, files) {
-      // trigger upload method immediately after files are selected
-      input.fileinput("upload");
     })
 
+
+    input.on("filebatchselected", function(event, files) {
+      // trigger upload method immediately after files are selected
+      input.fileinput("upload")
+    })
+
+
     let vue = this
+
+    // fast hack because bootstrap fileinput events doesn't fireup
+    $(document).on('click', '.kv-file-remove', function () {
+      let index = $(".kv-file-remove").index(this) / 2
+      vue.job.filesduration -= vue.job.files[index].fileduration
+      vue.job.files.splice(index, 1)
+    })
+
+    
     $('#fileinput').on('fileuploaded', function(event, data, previewId, index) {
       let form = data.form, files = data.files, extra = data.extra, 
 	  response = data.response, reader = data.reader;
-      let duration = response.duration
-      let filehash = response.hashid
+      var duration = response.duration
+      var filehash = response.hashid
       vue.job.activate = false
-      vue.job.fileduration = duration
-      vue.job.filehash = filehash
+      let f = {
+	fileduration: duration,
+	filehash: filehash
+      }
+      vue.job.filesduration += duration
+      vue.job.files.push(f)
     });
   }
+  ////
+  // End Mounted hook
+  ////
 }
 
 
 export default component
 
-</script>
+    </script>
 
 <style>
 #app {
-      font-family: 'Avenir', Helvetica, Arial, sans-serif;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      text-align: center;
-      color: #2c3e50;
-      margin: 0;
-  }
+    font-family: 'Avenir', Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-align: center;
+    color: #2c3e50;
+    margin: 0;
+}
 
 #nav {
     border-radius: 0;
 }
-</style>
+    </style>
