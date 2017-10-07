@@ -84,6 +84,16 @@ const messages = {
       enterdate: 'Enter date',
       channel: 'Select the channel to stream to stream to',
       submit: 'submit'
+    },
+
+    
+    onestream: {
+      inf: 'Infinite',
+      taskid: 'Task ID',
+      streamstart: 'Stream Start',
+      filename: 'Filename',
+      fileduration: 'FileDuration',
+      filedownload: 'File download'
     }
 
 
@@ -172,6 +182,15 @@ const messages = {
       enterdate: 'أدخل التاريخ',
       channel: 'قم بتحديد القناة إلى تيار إلى تيار إلى',
       submit: 'إرسال'
+    },
+
+    onestream: {
+      inf: 'لا نهاية',
+      taskid: 'معرف المهمة',
+      streamstart: 'ستريم ستارت',
+      filename: 'اسم الملف',
+      fileduration: 'مدة الملف',
+      filedownload: 'تحميل الملف'
     }
     
   }

@@ -6,6 +6,8 @@ from flask_admin import BaseView, expose
 from flask import session, redirect, url_for, request, flash
 from audiosm.jobs.models import JobModel
 from audiosm.streams.models import StreamModel
+from wtforms.fields import PasswordField
+from audiosm.extensions import celery
 
 
 class LoginView(BaseView):
@@ -42,14 +44,29 @@ class LogoutView(BaseView):
 
 
 class UserAdminView(ModelView):
-    column_exclude_list = ['password', ]
-    form_excluded_columns = ['password', ]
+
+    form_extra_fields = {
+        'password': PasswordField('password')
+    }
     inline_models = [JobModel]
 
+    column_exclude_list = ('password',)
 
-admin_ob.add_view(UserAdminView(UserModel, db.session))
-admin_ob.add_view(ModelView(RoleModel, db.session))
+    form_excluded_columns = ('password',)
+
+    def on_model_change(self, form, model: UserModel, is_created):
+        if len(model.password):
+            model.set_password(model.password)
+
+
+class JobAdminView(ModelView):
+    def on_model_delete(self, model):
+        celery.control.revoke(model.taskid, terminate=True, signal='SIGKILL')
+
+
+admin_ob.add_view(UserAdminView(UserModel, db.session, name='Users'))
+admin_ob.add_view(ModelView(RoleModel, db.session, name='Roles'))
 admin_ob.add_view(LoginView(name='Login', endpoint='login'))
 admin_ob.add_view(LogoutView(name='Logout', endpoint='logout'))
-admin_ob.add_view(ModelView(JobModel, db.session))
-admin_ob.add_view(ModelView(StreamModel, db.session))
+admin_ob.add_view(JobAdminView(JobModel, db.session, 'Jobs'))
+admin_ob.add_view(ModelView(StreamModel, db.session, 'Streams'))

@@ -81,7 +81,7 @@ class UserModel(db.Model, SurrogatePK, UserMixin):
                             backref=db.backref('users', lazy='dynamic'))
 
 
-    def __init__(self, username, email, password=None, *args, **kwargs):
+    def __init__(self, username=None, email=None, password=None, *args, **kwargs):
         super().__init__(username=username, email=email, *args, **kwargs)
         if password:
             self.set_password(password)

@@ -6,19 +6,19 @@
         <a class="navbar-brand" href="#">{{$t("name")}}</a>
         </div>
         <ul class="nav navbar-nav">
-        <router-link active-class="active" tag="li" to="home"><router-link to="home">{{$t("home")}}</router-link></router-link>
+        <router-link active-class="active" tag="li" to="home"><router-link to="/home">{{$t("home")}}</router-link></router-link>
 
-        <router-link active-class="active"  tag="li" to="contact"> <router-link to="contact">{{$t("contact")}}</router-link> </router-link>     </li>
+        <router-link active-class="active"  tag="li" to="contact"> <router-link to="/contact">{{$t("contact")}}</router-link> </router-link>     </li>
 
 	<li class="dropdown" v-if="user.authenticated">
 	    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{$t('menu.actions')}}<span class="caret"></span></a>
 	    <ul class="dropdown-menu">
 		<li class="dropdown-header">{{$t('menu.stream')}}</li>
 		<li><a @click="opentheModal()" href="#">{{$t('menu.addstream')}}</a></li>
-		<li><router-link to="streams">{{$t('menu.managestreams')}}</router-link></li>
+		<li><router-link to="/streams">{{$t('menu.managestreams')}}</router-link></li>
 		<li role="separator" class="divider"></li>
 		<li class="dropdown-header">{{$t('menu.jobs')}}</li>
-		<li><router-link to="jobs">{{$t('menu.managejobs')}}</router-link></li>
+		<li><router-link to="/jobs">{{$t('menu.managejobs')}}</router-link></li>
 		<li><a @click="opentheJobModal()" href="#">{{$t('menu.addjob')}}</a></li>
 		</ul>
 
@@ -41,15 +41,15 @@
 	<template v-if="locale == 'ar'">
 	    <ul class="nav navbar-nav navbar-left">
 		<template v-if="!user.authenticated">
-		    <router-link active-class="active" tag="li" to="login">
-			<router-link to="login">
+		    <router-link active-class="active" tag="li" to="/login">
+			<router-link to="/login">
 			    <span class="glyphicon glyphicon-log-in"></span> {{$t("login")}}
 			    </router-link>
 		    </router-link>
       </template>
 		<template v-else>
 		  <li>
-		    <router-link to="login" v-on:click.native="logout()">
+		    <router-link to="/login" v-on:click.native="logout()">
 		      <span class="glyphicon glyphicon-log-in"></span> {{$t('bar.logout')}}
 		    </router-link>
 		  </li>
@@ -59,15 +59,15 @@
 	<template v-else>
 	  <ul class="nav navbar-nav navbar-right">
 	    <template v-if="!user.authenticated">
-	      <router-link active-class="active" tag="li" to="login">
-		<router-link to="login">
+	      <router-link active-class="active" tag="li" to="/login">
+		<router-link to="/login">
 		  <span class="glyphicon glyphicon-log-in"></span> {{$t("login")}}
 		</router-link>
 	      </router-link>
 	    </template>
 	    <template v-else>
 	      <li>
-		<router-link to="login" v-on:click.native="logout()">
+		<router-link to="/login" v-on:click.native="logout()">
 		  <span class="glyphicon glyphicon-log-in"></span> {{$t('bar.logout')}}
 		</router-link>
 	      </li>
@@ -366,15 +366,17 @@ let component =  {
       }
 
       
-      let data = {
+      let data = JSON.stringify({
 	stream: {
 	  name: this.job.sname
 	},
-	files: this.job.files,
+	mfiles: this.job.files,
 	streamstart: this.job.playnow ? moment().utc().format('YYYY-MM-DDTHH:mm:ssZZ') : this.getUTCDate(),
 	streamfinish: moment(this.datefinish).utc().format('YYYY-MM-DDTHH:mm:ssZZ'),
-	inf: this.job.infinite
-      }
+	inf: this.job.infinite,
+	filesduration: this.job.filesduration
+      })
+      console.log(data)
       
       let modal = this.$refs.addJob
       this.$http.post(JOB_ADD_URL, data, {headers: auth.getAuthHeader()})
@@ -487,6 +489,7 @@ let component =  {
 	fileduration: duration,
 	filehash: filehash
       }
+ 
       vue.job.filesduration += duration
       vue.job.files.push(f)
     });

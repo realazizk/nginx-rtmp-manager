@@ -34,11 +34,13 @@ class TestJobModel:
         assert len(j.files) == 0
 
         j.add_file(
-            'smthing'
+            'smthing',
+            12.12
         )
         assert len(j.files) == 1
 
         j.add_file(
-            'other'
+            'other',
+            14.14
         )
         assert len(j.files) == 2

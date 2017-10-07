@@ -6,6 +6,7 @@ from flask import Blueprint, jsonify, request, current_app
 from flask_apispec import marshal_with, use_kwargs
 from flask_jwt import current_identity, jwt_required
 
+import json
 from audiosm import settings
 from audiosm.exceptions import InvalidUsage
 from audiosm.extensions import redis_store
@@ -32,11 +33,11 @@ def fileupload():
         hashid = m.hexdigest()
         pth = os.path.join(settings.Config.UPLOAD_FOLDER, hashid)
         f.save(pth)
-        redis_store.set(hashid, pth)
         try:
             container = av.open(pth)
         except av.AVError:
             return jsonify(dict(uploaded='ERROR'))
+        redis_store.set(hashid, json.dumps({'filename': pth, 'duration': container.duration / av.time_base}))
         return jsonify(dict(uploaded='OK',
                             duration=container.duration / av.time_base,
                             hashid=hashid))
@@ -71,7 +72,7 @@ def getjobs():
 @jwt_required()
 @use_kwargs(JobSchema)
 @marshal_with(JobSchema)
-def newjob(stream, files, streamstart, inf, **kwargs):
+def newjob(stream, mfiles, streamstart, inf, filesduration, **kwargs):
     stream = StreamModel.query.filter_by(name=stream['name']).first()
     if not stream:
         raise InvalidUsage.stream_not_found()
@@ -80,15 +81,16 @@ def newjob(stream, files, streamstart, inf, **kwargs):
                           adminid=current_identity.id, inf=inf,
                           streamstart=streamstart, **kwargs)
 
-    for file in files:
+    for file in mfiles:
         try:
-            fpth = redis_store.get(file['filehash'])
+            obj = json.loads(redis_store.get(file['filehash']))
+            fpth, duration = obj['filename'], obj['duration']
         except KeyError:
             continue
+
         if not fpth:
             raise InvalidUsage.file_not_found()
-        fpth = fpth.decode('utf-8')
-        job.add_file(fpth)
+        job.add_file(fpth, duration)
     instancejs = JobSchema
     result = instancejs.dump(job)
     current_app.logger.info(result.data)
@@ -116,3 +118,12 @@ def deletejob(id):
     celery.control.revoke(job.taskid, terminate=True, signal='SIGKILL')
     job.delete()
     return '', 200
+
+
+@bp.route('/api/cjobs/<int:id>', methods=('GET',))
+@marshal_with(JobsSchema)
+def get_current_jobs(id):
+    stream = StreamModel.get_by_id(id)
+    if stream is None:
+        raise InvalidUsage.stream_not_found()
+    return stream.jobs

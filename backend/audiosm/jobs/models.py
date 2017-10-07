@@ -21,15 +21,15 @@ class JobModel(db.Model, SurrogatePK):
     streamfinish = Column(db.DateTime, nullable=True)
     files = relationship('FileModel', backref=db.backref('job'), cascade="all, delete-orphan")
 
-    def __init__(self, streamid, adminid, **kwargs):
+    def __init__(self, streamid=None, adminid=None, **kwargs):
         super().__init__(streamid=streamid, adminid=adminid, **kwargs)
 
     @hybrid_property
     def username(self):
         return self.admin.username
 
-    def add_file(self, filename):
-        FileModel.create(filename=filename, jobid=self.id)
+    def add_file(self, filename, duration):
+        FileModel.create(filename=filename, jobid=self.id, duration=duration)
 
 
 class FileModel(db.Model, SurrogatePK):
@@ -37,7 +37,8 @@ class FileModel(db.Model, SurrogatePK):
 
     filename = Column(db.String(300))
     jobid = reference_col('jobs')
+    duration = Column(db.Float())
 
-    def __init__(self, filename, **kwargs):
+    def __init__(self, filename=None, **kwargs):
         "docstring"
         super().__init__(filename=filename, **kwargs)

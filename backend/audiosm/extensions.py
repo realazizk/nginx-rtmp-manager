@@ -9,6 +9,7 @@ from flask_redis import FlaskRedis
 from audiosm.settings import Config
 from celery import Task
 from flask import session
+from flask_admin import expose
 
 
 class CRUDMixin(Model):
@@ -76,6 +77,12 @@ class MyAdminIndexView(AdminIndexView):
         if not session.get('logged_in'):
             return self.render('login.html')
         self._template_args['username'] = session.get('username')
+
+    @expose('/')
+    def index(self):
+        return self.render('myhome.html')
+        
+    
 
 
 admin_ob = Admin(name='streammanager', template_mode='bootstrap3',
