@@ -20,6 +20,8 @@
 
 import bus from '@/eventbus.js'
 import {API_URL, SERVER_URL} from '@/shared.js'
+import Hls from 'hls.js'
+
 
 var component = {
   data() {

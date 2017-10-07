@@ -54,6 +54,7 @@ import {API_URL, SERVER_URL} from '@/shared.js'
 import auth from '@/auth'
 import bus from '@/eventbus.js'
 import moment from 'moment'
+import Hls from 'hls.js'
 
 
 export default {
