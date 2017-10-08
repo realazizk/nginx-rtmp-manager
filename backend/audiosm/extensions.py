@@ -10,6 +10,8 @@ from audiosm.settings import Config
 from celery import Task
 from flask import session
 from flask_admin import expose
+from raven.contrib.flask import Sentry
+
 
 
 class CRUDMixin(Model):
@@ -44,6 +46,7 @@ cors = CORS()
 celery = Celery(__name__, broker=Config.CELERY_BROKER_URL)
 migrate = Migrate(db=db)
 redis_store = FlaskRedis()
+sentry = Sentry(dsn='https://36d4cce923fc48f0b21705cc10a93c5c:08146222ac88435b94731013245eb5b8@sentry.io/227345')
 
 
 class DatabaseTask(Task):

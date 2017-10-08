@@ -13,7 +13,7 @@ import jwt as bjwt
 
 from audiosm.exceptions import InvalidUsage
 from audiosm.extensions import (bcrypt, celery, cors, db, jwt, migrate,
-                                redis_store, admin_ob)
+                                redis_store, admin_ob, sentry)
 from audiosm.settings import devConfig, Config
 
 
@@ -81,6 +81,8 @@ def register_extensions(app: Flask):
     migrate.init_app(app)
     redis_store.init_app(app)
     admin_ob.init_app(app)
+    if app.config['NAME'] == 'PROD':
+        sentry.init_app(app)
 
 
 def register_blueprints(app: Flask):

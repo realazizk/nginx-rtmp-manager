@@ -39,6 +39,7 @@ class devConfig(Config):
     SQLALCHEMY_DATABASE_URI = 'sqlite:///{0}'.format(DB_PATH)
     JWT_EXPIRATION_DELTA = timedelta(10**6)  # for easier testing
     DEBUG = True
+    NAME = 'DEV'
 
 
 class prodConfig(Config):
@@ -50,6 +51,7 @@ class prodConfig(Config):
     # FIXME: bad solution
     # should only be used for remember me
     JWT_EXPIRATION_DELTA = timedelta(10**6)
+    NAME = 'PROD'
 
 
 class testConfig(Config):
@@ -59,3 +61,4 @@ class testConfig(Config):
     SQLALCHEMY_DATABASE_URI = 'sqlite://'
     # For faster tests; needs at least 4 to avoid "ValueError: Invalid rounds"
     BCRYPT_LOG_ROUNDS = 4
+    NAME = 'TEST'

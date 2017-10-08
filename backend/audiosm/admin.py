@@ -32,6 +32,33 @@ class LoginView(BaseView):
     def is_visible(self):
         return False
 
+class MyModelView(ModelView):
+
+    def is_accessible(self):
+        if not session.get('logged_in'):
+            return False
+        a = session['username']
+        user = UserModel.query.filter_by(username=a).first()
+        if not user or not user.is_active:
+            return False
+
+        if user.has_role('admin'):
+            return True
+
+        return False
+
+    def _handle_view(self, name, **kwargs):
+        """
+        Override builtin _handle_view in order to redirect users when a view is not accessible.
+        """
+        if not self.is_accessible():
+            if session.get('logged_in'):
+                # permission denied
+                abort(403)
+            else:
+                # login
+                return self.render('login.html')
+        self._template_args['username'] = session.get('username')
 
 class LogoutView(BaseView):
     @expose('/', methods=('GET',))
@@ -43,10 +70,10 @@ class LogoutView(BaseView):
         return False
 
 
-class UserAdminView(ModelView):
+class UserAdminView(MyModelView):
 
     form_extra_fields = {
-        'password': PasswordField('password')
+        'password2': PasswordField('password')
     }
     inline_models = [JobModel]
 
@@ -55,18 +82,18 @@ class UserAdminView(ModelView):
     form_excluded_columns = ('password',)
 
     def on_model_change(self, form, model: UserModel, is_created):
-        if len(model.password):
-            model.set_password(model.password)
+        if len(model.password2):
+            model.set_password(model.password2)
 
 
-class JobAdminView(ModelView):
+class JobAdminView(MyModelView):
     def on_model_delete(self, model):
         celery.control.revoke(model.taskid, terminate=True, signal='SIGKILL')
 
 
 admin_ob.add_view(UserAdminView(UserModel, db.session, name='Users'))
-admin_ob.add_view(ModelView(RoleModel, db.session, name='Roles'))
+admin_ob.add_view(MyModelView(RoleModel, db.session, name='Roles'))
 admin_ob.add_view(LoginView(name='Login', endpoint='login'))
 admin_ob.add_view(LogoutView(name='Logout', endpoint='logout'))
 admin_ob.add_view(JobAdminView(JobModel, db.session, 'Jobs'))
-admin_ob.add_view(ModelView(StreamModel, db.session, 'Streams'))
+admin_ob.add_view(MyModelView(StreamModel, db.session, 'Streams'))
